@@ -822,12 +822,21 @@
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
 
-            function printField(label, value, yPos) {
+            // Updated printField to support text wrapping
+            function printField(label, value, yPos, maxWidth) {
                 doc.setFont("helvetica", "bold");
                 doc.text(label, leftX, yPos);
                 doc.setFont("helvetica", "normal");
                 const val = value ? String(value).toUpperCase() : "";
-                doc.text(":  " + val, valueX, yPos);
+                
+                if (maxWidth) {
+                    const splitVal = doc.splitTextToSize(":  " + val, maxWidth);
+                    doc.text(splitVal, valueX, yPos);
+                    return splitVal.length; // Return number of lines
+                } else {
+                    doc.text(":  " + val, valueX, yPos);
+                    return 1;
+                }
             }
 
             function printDateField(label, value, yPos) {
@@ -836,13 +845,26 @@
                 doc.setFont("helvetica", "normal");
                 const val = formatDate(value);
                 doc.text(":  " + val, valueX, yPos);
+                return 1;
             }
 
-            printField("1. Name in Full", document.getElementById('fullName').value, y); y += lineHeight;
-            printField("2. Age", document.getElementById('age').value, y); y += lineHeight;
-            printDateField("3. Date of Birth", document.getElementById('dob').value, y); y += lineHeight;
-            printField("4. Qualification", document.getElementById('qualification').value, y); y += lineHeight;
-            printField("5. Father's Name", document.getElementById('relName').value, y); y += lineHeight;
+            // Max width for text next to photo box (approx 75 units)
+            const textMaxWidth = 75;
+
+            let lines = printField("1. Name in Full", document.getElementById('fullName').value, y, textMaxWidth); 
+            y += (lines * lineHeight);
+            
+            lines = printField("2. Age", document.getElementById('age').value, y, textMaxWidth); 
+            y += (lines * lineHeight);
+            
+            lines = printDateField("3. Date of Birth", document.getElementById('dob').value, y); 
+            y += (lines * lineHeight);
+            
+            lines = printField("4. Qualification", document.getElementById('qualification').value, y, textMaxWidth); 
+            y += (lines * lineHeight);
+            
+            lines = printField("5. Father's Name", document.getElementById('relName').value, y, textMaxWidth); 
+            y += (lines * lineHeight);
 
             // Explicitly push address down to avoid photo overlap
             y = 105;
