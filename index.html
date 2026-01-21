@@ -43,7 +43,7 @@
     <nav class="bg-orange-700 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <!-- Placeholder Logo Display -->
+                <!-- Placeholder/Preview Logo Display -->
                 <img id="logoPreview" src="" class="h-10 w-auto bg-white rounded p-1 object-contain hidden">
                 <div class="bg-white text-orange-700 p-1.5 rounded font-bold text-xl" id="defaultLogoIcon">B</div>
                 <div>
@@ -68,7 +68,16 @@
     <div class="max-w-6xl mx-auto px-4 py-8">
         
         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-yellow-800 text-sm">
-            <i class="fas fa-info-circle mr-2"></i> <strong>Tip:</strong> Upload the "BOB New Log.png" using the button above. The generated PDF will convert all text to UPPERCASE automatically.
+            <div class="flex items-start gap-2">
+                <i class="fas fa-info-circle mt-1"></i>
+                <div>
+                    <strong>Logo Setup:</strong> The app attempts to load the official logo automatically. If it fails (due to browser security), please 
+                    <a href="https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png" target="_blank" class="underline font-bold text-orange-600">click here to download the logo</a> 
+                    and use the "Upload Logo" button above.
+                    <br>
+                    <strong>Note:</strong> All dates in the PDF will be formatted as <strong>DD-MM-YYYY</strong>.
+                </div>
+            </div>
         </div>
 
         <form id="bankForm" oninput="calculateNetWorth()">
@@ -426,8 +435,34 @@
         const { jsPDF } = window.jspdf;
 
         // --- Logo Handling ---
-        // A simple orange circle with a 'B' as default placeholder
-        let logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACXUlEQVR4nO2ZwW3DMAyGfQoP0K1z9AAdI/sA3aBbtGMv0K1z5AAdI8fo1it0gA7Sj3YiR7Jk2bJsybI/EAhF4iN/iZRE0QdjjDH2r621B+AArIEt8K2974FvY/ezF5F9sAWewB14ABf+38AHsC+NixKRc7AFHsFfQ60uF/6+Nf8vIi3wAv4KqnW58LdhfiQiF+AJPINqfS78TZgvicgJ+MhU63Phb8P8SEQ2wA/W2l7n78L8SETWwK1zbS/8bZgfiUjP+btz7S78bZg/JbIG7pxre+Fvw/xIRHZw/u5c2wt/G+ZHIrKD83fn2l742zA/EpEdnL871/bC34b5kYjs4PzduXYX/jbMnxJZw/m7c+0u/G2YPxKRHZy/O9f2wt+G+ZGI7OD83bm2F/42zI9EZAfn7861vfC3YX4kIjv/5fztQ+Nf9yIypVqfC39fM/9MRKZU63Ph72vmn4nIlGp9Lvx9zfzz3yKyg/N359rdh8b/SUR+gC3V+lz4+9b8P4nIAnisVOtz4e9b8/8iIuf816d2/9j4172I9Jz/E/irU63Lhb9vzf+LyJz/M/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyA3/D/BXp1qXC3/fmv8XkTv+H+CvTrUuF/6+Nf8vIg/8P8BfnWpdLvx9a/5fRJ74f4C/OtW6XPj71vy/iDzx/wB/dap1ufD3rfk/Y4wxxn4B7/1779Fk+tAAAAAASUVORK5CYII=";
+        // Default placeholder
+        let logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACXUlEQVR4nO2ZwW3DMAyGfQoP0K1z9AAdI/sA3aBbtGMv0K1z5AAdI8fo1it0gA7Sj3YiR7Jk2bJsybI/EAhF4iN/iZRE0QdjjDH2r621B+AArIEt8K2974FvY/ezF5F9sAWewB14ABf+38AHsC+NixKRc7AFHsFfQ60uF/6+Nf8vIi3wAv4KqnW58LdhfiQiF+AJPINqfS78TZgvicgJ+MhU63Phb8P8SEQ2wA/W2l7n78L8SETWwK1zbS/8bZgfiUjP+btz7S78bZg/JbIG7pxre+Fvw/xIRHZw/u5c2wt/G+ZHIrKD83fn2l742zA/EpEdnL871/bC34b5kYjs4PzduXYX/jbMnxJZw/m7c+0u/G2YPxKRHZy/O9f2wt+G+ZGI7OD83bm2F/42zI9EZAfn7861vfC3YX4kIjv/5fztQ+Nf9yIypVqfC39fM/9MRKZU63Ph72vmn4nIlGp9Lvx9zfzz3yKyg/N359rdh8b/SUR+gC3V+lz4+9b8P4nIAnisVOtz4e9b8/8iIuf816d2/9j4172I9Jz/E/irU63Lhb9vzf+LyJz/M/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyA3/D/BXp1qXC3/fmv8XkTv+H+CvTrUuF/6+Nf8vIg/8P8BfnWpdLvx9a/5fRJ74f4C/OtW6XPj71vy/iDzx/wB/dap1ufD3rfk/Y4wxxn4B7/1779Fk+tAAAAAASUVORK5CYII=";
+
+        // Try to load external logo
+        const officialLogoUrl = "https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png";
+
+        window.onload = function() {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                try {
+                    logoBase64 = canvas.toDataURL('image/png');
+                    // Update preview
+                    const previewImg = document.getElementById('logoPreview');
+                    previewImg.src = logoBase64;
+                    previewImg.classList.remove('hidden');
+                    document.getElementById('defaultLogoIcon').classList.add('hidden');
+                } catch(e) {
+                    console.log("CORS prevented auto-converting logo. User must upload manually.");
+                }
+            };
+            img.src = officialLogoUrl;
+        }
 
         function handleLogoUpload(input) {
             if (input.files && input.files[0]) {
@@ -442,6 +477,16 @@
                 }
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+
+        // --- Date Formatter (YYYY-MM-DD -> DD-MM-YYYY) ---
+        function formatDate(dateString) {
+            if(!dateString) return "";
+            const parts = dateString.split("-"); // Browser date inputs always return YYYY-MM-DD
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            return dateString;
         }
 
         // --- Row Management Functions ---
@@ -618,7 +663,7 @@
         toggleOccupationFields();
 
         // --- Helper to get table data ---
-        // MODIFIED: Automatically converts text to UPPERCASE
+        // MODIFIED: Automatically converts text to UPPERCASE and Formats Dates
         function getTableData(tableId) {
             const rows = document.querySelectorAll(`#${tableId} tbody tr`);
             const data = [];
@@ -633,8 +678,14 @@
                     let val = input.value || '';
                     if(val) {
                         hasData = true;
-                        // FORCE UPPERCASE FOR PDF
-                        val = String(val).toUpperCase();
+                        
+                        // Check if it is a date input
+                        if(input.type === 'date') {
+                             val = formatDate(val);
+                        } else {
+                             // FORCE UPPERCASE FOR PDF
+                             val = String(val).toUpperCase();
+                        }
                     }
                     rowData.push(val);
                 });
@@ -658,7 +709,7 @@
             // Add Logo (Left aligned)
             if(logoBase64) {
                 try {
-                    // MODIFIED: Aspect Ratio 317x130 (approx 2.44)
+                    // Aspect Ratio 317x130 (approx 2.44)
                     // Fitting into header: Width 35mm, Height ~14.3mm
                     doc.addImage(logoBase64, 'PNG', 10, 12, 35, 14.35);
                 } catch(e) {
@@ -704,9 +755,18 @@
                 doc.text(":  " + val, valueX, yPos);
             }
 
+            // Format date specifically for DOB
+            function printDateField(label, value, yPos) {
+                doc.setFont("helvetica", "bold");
+                doc.text(label, leftX, yPos);
+                doc.setFont("helvetica", "normal");
+                const val = formatDate(value);
+                doc.text(":  " + val, valueX, yPos);
+            }
+
             printField("1. Name in Full", document.getElementById('fullName').value, y); y += lineHeight;
             printField("2. Age", document.getElementById('age').value, y); y += lineHeight;
-            printField("3. Date of Birth", document.getElementById('dob').value, y); y += lineHeight;
+            printDateField("3. Date of Birth", document.getElementById('dob').value, y); y += lineHeight;
             printField("4. Qualification", document.getElementById('qualification').value, y); y += lineHeight;
             printField("5. Father's Name", document.getElementById('relName').value, y); y += lineHeight;
 
@@ -926,7 +986,8 @@
             // Signature Area with Dynamic Place/Date
             // FORCE UPPERCASE
             const place = document.getElementById('signPlace').value.toUpperCase();
-            const date = document.getElementById('signDate').value.toUpperCase();
+            // FORMAT DATE DD-MM-YYYY
+            const date = formatDate(document.getElementById('signDate').value);
             
             doc.setFontSize(10);
             doc.text(`Place: ${place ? place : '_________________'}`, leftX, y);
