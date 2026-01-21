@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Form 135 - Digital Filler</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- jsPDF & AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .form-section { @apply bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6; }
+        .section-title { @apply text-lg font-bold text-orange-700 mb-4 border-b pb-2 flex items-center gap-2; }
+        .input-group { @apply mb-4; }
+        .input-label { @apply block text-sm font-medium text-gray-700 mb-1; }
+        .form-input { @apply w-full rounded-md border-gray-300 border shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 text-sm; }
+        .btn-primary { @apply bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition-colors font-medium shadow-sm flex items-center gap-2; }
+        .btn-secondary { @apply bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm; }
+        .table-input { @apply w-full border-none bg-transparent p-1 focus:ring-1 focus:ring-orange-500 text-sm; }
+        .calc-box { @apply bg-gray-50 p-4 rounded border border-gray-200 text-center; }
+        .calc-label { @apply text-xs font-bold text-gray-500 uppercase tracking-wide; }
+        .calc-value { @apply text-xl font-bold text-gray-800; }
+        
+        /* Custom scrollbar for tables */
+        .table-container { @apply overflow-x-auto border rounded-md border-gray-200 mb-2; }
+        th { @apply bg-gray-100 text-left text-xs font-semibold text-gray-600 p-2 border-b border-r border-gray-200 whitespace-nowrap; }
+        td { @apply border-b border-r border-gray-200 p-0 min-w-[100px]; }
+        td:last-child { @apply border-r-0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-orange-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <!-- Placeholder Logo Display -->
+                <img id="logoPreview" src="" class="h-10 w-auto bg-white rounded p-1 object-contain hidden">
+                <div class="bg-white text-orange-700 p-1.5 rounded font-bold text-xl" id="defaultLogoIcon">B</div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Bank of Baroda</h1>
+                    <p class="text-xs text-orange-100 opacity-90">Form No. 135 Digital Assistant</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                 <!-- File Upload for Logo -->
+                <label class="bg-orange-600 border border-orange-400 text-white px-3 py-2 rounded shadow hover:bg-orange-500 cursor-pointer text-sm flex items-center gap-2">
+                    <i class="fas fa-image"></i> Upload Logo
+                    <input type="file" id="logoUpload" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
+                </label>
+                <button onclick="generatePDF()" class="bg-white text-orange-700 px-4 py-2 rounded shadow hover:bg-orange-50 font-bold transition flex items-center gap-2">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-yellow-800 text-sm">
+            <i class="fas fa-info-circle mr-2"></i> <strong>Tip:</strong> Upload the "BOB New Log.png" using the button above. The generated PDF will convert all text to UPPERCASE automatically.
+        </div>
+
+        <form id="bankForm" oninput="calculateNetWorth()">
+            
+            <!-- 1. Personal Details -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-user"></i> 1-5. Personal Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="input-group md:col-span-2">
+                        <label class="input-label">1. Name in Full</label>
+                        <input type="text" id="fullName" class="form-input" placeholder="First Middle Last">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">2. Age</label>
+                        <input type="number" id="age" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">3. Date of Birth</label>
+                        <input type="date" id="dob" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">4. Qualification</label>
+                        <input type="text" id="qualification" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">5. Father's / Husband's Name</label>
+                        <input type="text" id="relName" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">10. PAN Number</label>
+                        <input type="text" id="pan" class="form-input uppercase">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">9. Annual Income (Rs.)</label>
+                        <input type="number" id="income" class="form-input calc-trigger">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Address Details -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> 6-7. Contact Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="input-label font-bold text-gray-900 mb-2 block">Permanent Residential Address</label>
+                        <textarea id="permAddress" rows="3" class="form-input"></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label font-bold text-gray-900 mb-2 block">Present Residential Address</label>
+                        <textarea id="currAddress" rows="3" class="form-input" onchange="updateHeirAddresses()"></textarea>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="input-group">
+                        <label class="input-label">Telephone (Office)</label>
+                        <input type="tel" id="telOffice" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Telephone (Resi)</label>
+                        <input type="tel" id="telResi" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Mobile</label>
+                        <input type="tel" id="mobile" class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Occupation -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-briefcase"></i> 8. Occupation / Line of Business</h2>
+                
+                <div class="mb-4">
+                    <label class="input-label">Occupation Type</label>
+                    <select id="occType" class="form-input" onchange="toggleOccupationFields()">
+                        <option value="service">Service (Salaried)</option>
+                        <option value="business">Business / Profession</option>
+                    </select>
+                </div>
+
+                <!-- Service Fields -->
+                <div id="serviceFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="input-group md:col-span-2">
+                        <label class="input-label">Name of Employer</label>
+                        <input type="text" id="employerName" class="form-input">
+                    </div>
+                    <div class="input-group md:col-span-2">
+                        <label class="input-label">Address of Employer</label>
+                        <input type="text" id="employerAddress" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Designation</label>
+                        <input type="text" id="designation" class="form-input">
+                    </div>
+                </div>
+
+                <!-- Business Fields -->
+                <div id="businessFields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="input-group md:col-span-2">
+                        <label class="input-label">Name of Firm/Company</label>
+                        <input type="text" id="firmName" class="form-input">
+                    </div>
+                    <div class="input-group md:col-span-2">
+                        <label class="input-label">Address of Firm</label>
+                        <input type="text" id="firmAddress" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Line of Activity</label>
+                        <input type="text" id="activity" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Established Since</label>
+                        <input type="text" id="established" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Capacity (Proprietor/Partner/Director)</label>
+                        <input type="text" id="capacity" class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Assets - Immovable -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-home"></i> 11.1 Details of Immovable Properties</h2>
+                <div class="table-container">
+                    <table class="w-full text-sm" id="immovableTable">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="w-1/6">(A) Nature of Property</th>
+                                <th class="w-1/6">(B) Location (Survey/Village)</th>
+                                <th class="w-1/6">(C) Owner Name</th>
+                                <th class="w-1/6">(D) Cost (Rs.)</th>
+                                <th class="w-1/6">(E) Market Value (Rs.)</th>
+                                <th class="w-1/6">(F) Encumbrance Details</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="addImmovableRow()" class="mt-2 text-orange-600 text-sm font-medium hover:underline">+ Add Property</button>
+            </div>
+
+            <!-- 5. Assets - Movable -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-coins"></i> 11.2 Movable Properties</h2>
+                
+                <!-- LIC -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-bold text-gray-700 mb-2">A. LIC Policies</h3>
+                    <div class="table-container">
+                        <table class="w-full text-sm" id="licTable">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th>Policy No</th>
+                                    <th>Sum Assured (Rs.)</th>
+                                    <th>Annual Premium</th>
+                                    <th>Paid Up To</th>
+                                    <th class="w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <button type="button" onclick="addLicRow()" class="mt-2 text-orange-600 text-sm font-medium hover:underline">+ Add Policy</button>
+                </div>
+
+                <!-- Deposits -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-bold text-gray-700 mb-2">B. Term Deposits / Bank Accounts</h3>
+                    <div class="table-container">
+                        <table class="w-full text-sm" id="bankTable">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th>Bank/Branch</th>
+                                    <th>FDR/Account No</th>
+                                    <th>Amount (Rs.)</th>
+                                    <th>Maturity Date</th>
+                                    <th class="w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <button type="button" onclick="addBankRow()" class="mt-2 text-orange-600 text-sm font-medium hover:underline">+ Add Deposit</button>
+                </div>
+
+                 <!-- Vehicles -->
+                 <div class="mb-6">
+                    <h3 class="text-sm font-bold text-gray-700 mb-2">11.3 Vehicles</h3>
+                    <div class="table-container">
+                        <table class="w-full text-sm" id="vehicleTable">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th>Reg. No.</th>
+                                    <th>Type (Car/Two Wheeler)</th>
+                                    <th>Value (Rs.)</th>
+                                    <th class="w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <button type="button" onclick="addVehicleRow()" class="mt-2 text-orange-600 text-sm font-medium hover:underline">+ Add Vehicle</button>
+                </div>
+            </div>
+
+            <!-- 6. Liabilities -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-hand-holding-usd"></i> 12. Details of Loans / Liabilities</h2>
+                <div class="table-container">
+                    <table class="w-full text-sm" id="liabilityTable">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th>Bank / Institution</th>
+                                <th>Purpose of Loan</th>
+                                <th>Security Given</th>
+                                <th>Present Outstanding (Rs.)</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="addLiabilityRow()" class="mt-2 text-orange-600 text-sm font-medium hover:underline">+ Add Liability</button>
+            </div>
+
+            <!-- NET WORTH CALCULATION -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 shadow-sm">
+                <h2 class="text-blue-800 font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fas fa-calculator"></i> Net Worth Summary
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="calc-box">
+                        <div class="calc-label">Total Assets</div>
+                        <div class="calc-value text-green-600" id="dispTotalAssets">₹ 0</div>
+                    </div>
+                    <div class="calc-box">
+                        <div class="calc-label">Total Liabilities</div>
+                        <div class="calc-value text-red-600" id="dispTotalLiab">₹ 0</div>
+                    </div>
+                    <div class="calc-box border-blue-300 bg-blue-100">
+                        <div class="calc-label text-blue-800">Net Worth</div>
+                        <div class="calc-value text-blue-900" id="dispNetWorth">₹ 0</div>
+                    </div>
+                </div>
+                <p class="text-xs text-blue-500 mt-2 text-center">* Calculated automatically from tables above</p>
+            </div>
+
+            <!-- 7. Other Details (Pt 13) -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-file-contract"></i> 13. Other Details</h2>
+                <label class="input-label">Details of Personal guarantee given for any Person/Firm (Name of Bank, Amount, Status etc.)</label>
+                <textarea id="guaranteeDetails" rows="3" class="form-input" placeholder="Enter details or 'NIL'"></textarea>
+            </div>
+
+            <!-- 8. Legal Heirs (Pt 14) -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-users"></i> 14. Particulars of Legal Heirs</h2>
+                <div class="table-container">
+                    <table class="w-full text-sm" id="heirTable">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th>Name</th>
+                                <th>Relationship</th>
+                                <th class="w-16">Age</th>
+                                <th>Address Source</th>
+                                <th>Address (If Other)</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="addHeirRow()" class="mt-2 text-orange-600 text-sm font-medium hover:underline">+ Add Heir</button>
+            </div>
+
+            <!-- 9. Nomination (Pt 15) -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-user-shield"></i> 15. Nomination Particulars</h2>
+                <div class="table-container">
+                    <table class="w-full text-sm" id="nominationTable">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th>Description of Assets</th>
+                                <th>Bank / Organization</th>
+                                <th>Account / Certificate</th>
+                                <th>Amount (At Present/Maturity)</th>
+                                <th class="w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="addNominationRow()" class="mt-2 text-orange-600 text-sm font-medium hover:underline">+ Add Nomination</button>
+            </div>
+
+            <!-- Enclosures & Declaration -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-paperclip"></i> Enclosures & Declaration</h2>
+                
+                <div class="mb-6 p-4 bg-gray-50 rounded border border-gray-200">
+                    <p class="font-bold text-sm mb-2">In Support of my above declaration, I enclose:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="rounded text-orange-600">
+                            <span>1. Balance Sheet, Profit & Loss Account, Trading Account, Capital Account (Audited / Unaudited).</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="rounded text-orange-600">
+                            <span>2. Copy of Employment Certificate with details of salary drawn.</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="rounded text-orange-600">
+                            <span>3. Copies of Agreement / Revenue Records / Society Certificate in respect of Land/Building/Flat owned by me.</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="rounded text-orange-600">
+                            <span>4. Copies of Income Tax / Wealth Tax Returns / Assessment Order.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-xs text-justify leading-relaxed bg-yellow-50 p-4 rounded border border-yellow-200 mb-4">
+                    <h3 class="font-bold mb-1">16. Declaration:</h3>
+                    I declare that I am / I am not (tick as applicable) a Director in any Bank. There is no litigation against me or the Firm/Co. in which I am the Proprietor / a Partner / a Director. The name of the Firm/Co. or the name of the Partners / Proprietor / Director of the Firm / Co. is not on the caution list of RBI / ECGC. The Proprietor / Partners / Directors of the Firm / Co. is/are not the Director in any Co-operative Bank. I also declare that the above information is complete, true and correct.
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div class="input-group">
+                        <label class="input-label">Place</label>
+                        <input type="text" id="signPlace" class="form-input" placeholder="e.g. Mumbai">
+                    </div>
+                     <div class="input-group">
+                        <label class="input-label">Date</label>
+                        <input type="date" id="signDate" class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="flex justify-center mt-8 mb-12">
+                <button type="button" onclick="generatePDF()" class="bg-orange-600 text-white px-8 py-4 rounded-lg shadow-lg hover:bg-orange-700 transition transform hover:-translate-y-1 font-bold text-lg flex items-center gap-3">
+                    <i class="fas fa-file-pdf fa-lg"></i> Generate & Download Form 135
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        // --- Logo Handling ---
+        // A simple orange circle with a 'B' as default placeholder
+        let logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACXUlEQVR4nO2ZwW3DMAyGfQoP0K1z9AAdI/sA3aBbtGMv0K1z5AAdI8fo1it0gA7Sj3YiR7Jk2bJsybI/EAhF4iN/iZRE0QdjjDH2r621B+AArIEt8K2974FvY/ezF5F9sAWewB14ABf+38AHsC+NixKRc7AFHsFfQ60uF/6+Nf8vIi3wAv4KqnW58LdhfiQiF+AJPINqfS78TZgvicgJ+MhU63Phb8P8SEQ2wA/W2l7n78L8SETWwK1zbS/8bZgfiUjP+btz7S78bZg/JbIG7pxre+Fvw/xIRHZw/u5c2wt/G+ZHIrKD83fn2l742zA/EpEdnL871/bC34b5kYjs4PzduXYX/jbMnxJZw/m7c+0u/G2YPxKRHZy/O9f2wt+G+ZGI7OD83bm2F/42zI9EZAfn7861vfC3YX4kIjv/5fztQ+Nf9yIypVqfC39fM/9MRKZU63Ph72vmn4nIlGp9Lvx9zfzz3yKyg/N359rdh8b/SUR+gC3V+lz4+9b8P4nIAnisVOtz4e9b8/8iIuf816d2/9j4172I9Jz/E/irU63Lhb9vzf+LyJz/M/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyJz/C/irU63Lhb9vzf+LyA3/D/BXp1qXC3/fmv8XkTv+H+CvTrUuF/6+Nf8vIg/8P8BfnWpdLvx9a/5fRJ74f4C/OtW6XPj71vy/iDzx/wB/dap1ufD3rfk/Y4wxxn4B7/1779Fk+tAAAAAASUVORK5CYII=";
+
+        function handleLogoUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    logoBase64 = e.target.result;
+                    // Show preview
+                    const img = document.getElementById('logoPreview');
+                    img.src = logoBase64;
+                    img.classList.remove('hidden');
+                    document.getElementById('defaultLogoIcon').classList.add('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- Row Management Functions ---
+        function createDeleteBtn(onClick) {
+            return `<button type="button" onclick="${onClick}; calculateNetWorth()" class="text-red-500 hover:text-red-700 p-2"><i class="fas fa-trash"></i></button>`;
+        }
+
+        function addImmovableRow() {
+            const tbody = document.querySelector('#immovableTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="border p-1">
+                    <select class="table-input">
+                        <option value="Plot of Land">Plot of Land</option>
+                        <option value="Agricultural Land">Agricultural Land</option>
+                        <option value="House / Godown">House / Godown</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Location"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Name"></td>
+                <td class="border p-1"><input type="number" class="table-input" placeholder="0"></td>
+                <td class="border p-1"><input type="number" class="table-input asset-val" placeholder="0"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Details"></td>
+                <td class="border p-1 text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>
+            `;
+        }
+
+        function addLicRow() {
+            const tbody = document.querySelector('#licTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Policy No"></td>
+                <td class="border p-1"><input type="number" class="table-input asset-val" placeholder="0"></td>
+                <td class="border p-1"><input type="number" class="table-input" placeholder="0"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Period"></td>
+                <td class="border p-1 text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>
+            `;
+        }
+
+        function addBankRow() {
+            const tbody = document.querySelector('#bankTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Bank"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Acc No"></td>
+                <td class="border p-1"><input type="number" class="table-input asset-val" placeholder="0"></td>
+                <td class="border p-1"><input type="date" class="table-input"></td>
+                <td class="border p-1 text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>
+            `;
+        }
+
+        function addVehicleRow() {
+            const tbody = document.querySelector('#vehicleTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Reg No"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Type"></td>
+                <td class="border p-1"><input type="number" class="table-input asset-val" placeholder="0"></td>
+                <td class="border p-1 text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>
+            `;
+        }
+
+        function addLiabilityRow() {
+            const tbody = document.querySelector('#liabilityTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Bank"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Purpose"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Security"></td>
+                <td class="border p-1"><input type="number" class="table-input liab-val" placeholder="0"></td>
+                <td class="border p-1 text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>
+            `;
+        }
+
+        function addHeirRow() {
+            const tbody = document.querySelector('#heirTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Name"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Relation"></td>
+                <td class="border p-1"><input type="number" class="table-input" placeholder="Age"></td>
+                <td class="border p-1">
+                    <select class="table-input" onchange="handleAddressChange(this)">
+                        <option value="custom">Enter Manually</option>
+                        <option value="same">Same as Mine</option>
+                    </select>
+                </td>
+                <td class="border p-1"><textarea class="table-input heir-addr" rows="1"></textarea></td>
+                <td class="border p-1 text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>
+            `;
+        }
+
+        function addNominationRow() {
+            const tbody = document.querySelector('#nominationTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Desc"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Bank"></td>
+                <td class="border p-1"><input type="text" class="table-input" placeholder="Cert No"></td>
+                <td class="border p-1"><input type="number" class="table-input" placeholder="Amount"></td>
+                <td class="border p-1 text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>
+            `;
+        }
+
+        // --- Address Logic ---
+        function handleAddressChange(selectElement) {
+            const row = selectElement.closest('tr');
+            const addrInput = row.querySelector('.heir-addr');
+            const mainAddr = document.getElementById('currAddress').value;
+
+            if (selectElement.value === 'same') {
+                addrInput.value = mainAddr;
+                addrInput.readOnly = true;
+                addrInput.classList.add('bg-gray-100', 'text-gray-500');
+            } else {
+                addrInput.value = '';
+                addrInput.readOnly = false;
+                addrInput.classList.remove('bg-gray-100', 'text-gray-500');
+            }
+        }
+
+        function updateHeirAddresses() {
+            const rows = document.querySelectorAll('#heirTable tbody tr');
+            rows.forEach(row => {
+                const select = row.querySelector('select');
+                if(select && select.value === 'same') {
+                    handleAddressChange(select);
+                }
+            });
+        }
+
+        // --- Net Worth Calculation ---
+        function calculateNetWorth() {
+            let totalAssets = 0;
+            let totalLiab = 0;
+
+            // Sum all inputs with class 'asset-val'
+            document.querySelectorAll('.asset-val').forEach(input => {
+                totalAssets += Number(input.value) || 0;
+            });
+
+            // Sum all inputs with class 'liab-val'
+            document.querySelectorAll('.liab-val').forEach(input => {
+                totalLiab += Number(input.value) || 0;
+            });
+
+            const netWorth = totalAssets - totalLiab;
+
+            document.getElementById('dispTotalAssets').innerText = '₹ ' + totalAssets.toLocaleString('en-IN');
+            document.getElementById('dispTotalLiab').innerText = '₹ ' + totalLiab.toLocaleString('en-IN');
+            document.getElementById('dispNetWorth').innerText = '₹ ' + netWorth.toLocaleString('en-IN');
+        }
+
+        function toggleOccupationFields() {
+            const type = document.getElementById('occType').value;
+            if(type === 'service') {
+                document.getElementById('serviceFields').classList.remove('hidden');
+                document.getElementById('businessFields').classList.add('hidden');
+            } else {
+                document.getElementById('serviceFields').classList.add('hidden');
+                document.getElementById('businessFields').classList.remove('hidden');
+            }
+        }
+
+        // Initialize rows
+        addImmovableRow();
+        addLicRow();
+        addBankRow();
+        addVehicleRow();
+        addLiabilityRow();
+        addHeirRow();
+        addNominationRow();
+        toggleOccupationFields();
+
+        // --- Helper to get table data ---
+        // MODIFIED: Automatically converts text to UPPERCASE
+        function getTableData(tableId) {
+            const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+            const data = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input, select, textarea');
+                const rowData = [];
+                let hasData = false;
+                inputs.forEach(input => {
+                    // Skip the select dropdown in heirs, we just want the text address
+                    if(tableId === 'heirTable' && input.tagName === 'SELECT') return; 
+                    
+                    let val = input.value || '';
+                    if(val) {
+                        hasData = true;
+                        // FORCE UPPERCASE FOR PDF
+                        val = String(val).toUpperCase();
+                    }
+                    rowData.push(val);
+                });
+                if(hasData) data.push(rowData);
+            });
+            return data;
+        }
+
+        // --- PDF GENERATION ---
+        function generatePDF() {
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            
+            // --- Header ---
+            doc.setFontSize(10);
+            doc.text("Javanika-zsc/07-08", 10, 10);
+            doc.text("ANNEXURE - I", 160, 10);
+            doc.text("F.NO.: 135", 160, 15);
+
+            // LOGO & TITLE
+            // Add Logo (Left aligned)
+            if(logoBase64) {
+                try {
+                    // MODIFIED: Aspect Ratio 317x130 (approx 2.44)
+                    // Fitting into header: Width 35mm, Height ~14.3mm
+                    doc.addImage(logoBase64, 'PNG', 10, 12, 35, 14.35);
+                } catch(e) {
+                    console.error("Logo Error", e);
+                }
+            }
+
+            // Title (Centered)
+            doc.setTextColor(233, 84, 14);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("Bank of Baroda", pageWidth/2, 25, { align: "center" });
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("(Head Office: Mandvi, Baroda)", pageWidth/2, 32, { align: "center" });
+
+            doc.setLineWidth(0.5);
+            doc.line(10, 35, 200, 35);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("PARTICULARS TO BE SUPPLIED BY THE APPLICANT / GUARANTOR", pageWidth/2, 42, { align: "center" });
+            doc.line(10, 44, 200, 44);
+
+            let y = 55;
+            const leftX = 14;
+            const valueX = 80;
+            const lineHeight = 6;
+
+            // --- Personal Details ---
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+
+            // Helper with Uppercase conversion
+            function printField(label, value, yPos) {
+                doc.setFont("helvetica", "bold");
+                doc.text(label, leftX, yPos);
+                doc.setFont("helvetica", "normal");
+                // FORCE UPPERCASE
+                const val = value ? String(value).toUpperCase() : "";
+                doc.text(":  " + val, valueX, yPos);
+            }
+
+            printField("1. Name in Full", document.getElementById('fullName').value, y); y += lineHeight;
+            printField("2. Age", document.getElementById('age').value, y); y += lineHeight;
+            printField("3. Date of Birth", document.getElementById('dob').value, y); y += lineHeight;
+            printField("4. Qualification", document.getElementById('qualification').value, y); y += lineHeight;
+            printField("5. Father's Name", document.getElementById('relName').value, y); y += lineHeight;
+
+            // Address Box
+            y += 2;
+            const addrY = y;
+            doc.setFont("helvetica", "bold");
+            doc.text("6. Addresses", leftX, y + 5);
+            
+            doc.rect(45, addrY, 75, 20); // Perm
+            doc.rect(125, addrY, 75, 20); // Pres
+            
+            doc.setFontSize(8);
+            doc.text("PERMANENT RESI.", 47, addrY + 4);
+            doc.text("PRESENT RESI.", 127, addrY + 4);
+            
+            doc.setFont("helvetica", "normal");
+            // FORCE UPPERCASE
+            const permAddr = doc.splitTextToSize(document.getElementById('permAddress').value.toUpperCase(), 70);
+            const presAddr = doc.splitTextToSize(document.getElementById('currAddress').value.toUpperCase(), 70);
+            doc.text(permAddr, 47, addrY + 9);
+            doc.text(presAddr, 127, addrY + 9);
+            
+            y = addrY + 25;
+            doc.setFontSize(10);
+            const phones = `Office: ${document.getElementById('telOffice').value}   Resi: ${document.getElementById('telResi').value}   Mobile: ${document.getElementById('mobile').value}`;
+            printField("7. Telephone Nos.", phones, y); y += lineHeight;
+
+            // Occupation
+            const occType = document.getElementById('occType').value;
+            // FORCE UPPERCASE
+            let occDetails = occType === 'service' 
+                ? `Service at ${document.getElementById('employerName').value.toUpperCase()}, ${document.getElementById('designation').value.toUpperCase()}`
+                : `Business: ${document.getElementById('firmName').value.toUpperCase()} (${document.getElementById('activity').value.toUpperCase()})`;
+            printField("8. Occupation", occDetails, y); y += lineHeight;
+
+            printField("9. Annual Income", "Rs. " + document.getElementById('income').value, y); y += lineHeight;
+            printField("10. PAN", document.getElementById('pan').value, y); y += lineHeight;
+
+            // --- 11. Assets ---
+            y += 5;
+            doc.setFont("helvetica", "bold");
+            doc.text("11. DETAILS OF ASSETS", leftX, y);
+            y += 5;
+
+            // 11.1 Immovable (Table)
+            doc.setFontSize(9);
+            doc.text("11.1 Immovable Properties:", leftX, y);
+            const immData = getTableData('immovableTable');
+            doc.autoTable({
+                startY: y + 2,
+                head: [['Nature', 'Location', 'Owner', 'Cost', 'Mkt Value', 'Encumbrance']],
+                body: immData,
+                theme: 'grid',
+                headStyles: { fillColor: [230, 230, 230], textColor: 0, fontSize: 8 },
+                bodyStyles: { fontSize: 8 },
+                margin: { left: 14, right: 14 }
+            });
+            y = doc.lastAutoTable.finalY + 6;
+
+            // 11.2 Movable
+            doc.text("11.2 Movable Properties:", leftX, y);
+            y += 4;
+            
+            // LIC
+            doc.setFontSize(8);
+            doc.text("(A) LIC Policies", leftX + 5, y);
+            const licData = getTableData('licTable');
+            if (licData.length > 0) {
+                doc.autoTable({
+                    startY: y + 2,
+                    head: [['Policy No', 'Sum Assured', 'Premium', 'Paid Up To']],
+                    body: licData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [240, 240, 240], textColor: 0, fontSize: 8 },
+                    margin: { left: 18, right: 14 }
+                });
+                y = doc.lastAutoTable.finalY + 5;
+            } else y += 5;
+
+            // Banks
+            doc.text("(B) Deposits / Bank Accounts", leftX + 5, y);
+            const bankData = getTableData('bankTable');
+            if (bankData.length > 0) {
+                doc.autoTable({
+                    startY: y + 2,
+                    head: [['Bank', 'Account No', 'Amount', 'Maturity']],
+                    body: bankData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [240, 240, 240], textColor: 0, fontSize: 8 },
+                    margin: { left: 18, right: 14 }
+                });
+                y = doc.lastAutoTable.finalY + 5;
+            } else y += 5;
+
+            // Vehicles (Table)
+            doc.setFontSize(9);
+            doc.text("11.3 Vehicles:", leftX, y);
+            const vehData = getTableData('vehicleTable');
+            if (vehData.length > 0) {
+                doc.autoTable({
+                    startY: y + 2,
+                    head: [['Reg No', 'Type', 'Value']],
+                    body: vehData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [230, 230, 230], textColor: 0, fontSize: 8 },
+                    margin: { left: 14, right: 14 }
+                });
+                y = doc.lastAutoTable.finalY + 8;
+            } else y += 10;
+
+            // Check page break
+            if (y > 240) { doc.addPage(); y = 20; }
+
+            // --- 12. Liabilities ---
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("12. DETAILS OF LOANS / LIABILITIES", leftX, y);
+            const liabData = getTableData('liabilityTable');
+            doc.autoTable({
+                startY: y + 3,
+                head: [['Bank/Inst', 'Purpose', 'Security', 'Outstanding']],
+                body: liabData,
+                theme: 'grid',
+                headStyles: { fillColor: [230, 230, 230], textColor: 0, fontSize: 8 },
+                margin: { left: 14, right: 14 }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // --- Net Worth Summary ---
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.1);
+            doc.rect(14, y, 180, 15);
+            doc.setFontSize(11);
+            doc.text("NET WORTH SUMMARY", 20, y + 10);
+            
+            const netWorth = document.getElementById('dispNetWorth').innerText;
+            const totAssets = document.getElementById('dispTotalAssets').innerText;
+            const totLiab = document.getElementById('dispTotalLiab').innerText;
+            
+            doc.setFontSize(9);
+            doc.text(`Total Assets: ${totAssets}`, 80, y + 6);
+            doc.text(`Total Liab: ${totLiab}`, 80, y + 11);
+            doc.setFontSize(12);
+            doc.text(`Net Worth: ${netWorth}`, 140, y + 9);
+            
+            y += 25;
+
+            // --- 13. Other Details ---
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.setFontSize(10);
+            doc.text("13. OTHER DETAILS (Guarantees given):", leftX, y);
+            // FORCE UPPERCASE
+            const guarantee = doc.splitTextToSize(document.getElementById('guaranteeDetails').value.toUpperCase(), 170);
+            doc.setFont("helvetica", "normal");
+            doc.text(guarantee, leftX + 5, y + 6);
+            y += (guarantee.length * 5) + 10;
+
+            // --- 14. Heirs ---
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.setFont("helvetica", "bold");
+            doc.text("14. PARTICULARS OF LEGAL HEIRS", leftX, y);
+            const heirData = getTableData('heirTable');
+            doc.autoTable({
+                startY: y + 3,
+                head: [['Name', 'Relationship', 'Age', 'Address']],
+                body: heirData,
+                theme: 'grid',
+                headStyles: { fillColor: [230, 230, 230], textColor: 0, fontSize: 8 },
+                margin: { left: 14, right: 14 }
+            });
+            y = doc.lastAutoTable.finalY + 8;
+
+            // --- 15. Nomination ---
+            if (y > 240) { doc.addPage(); y = 20; }
+            doc.text("15. NOMINATION PARTICULARS", leftX, y);
+            const nomData = getTableData('nominationTable');
+            doc.autoTable({
+                startY: y + 3,
+                head: [['Asset Description', 'Bank/Org', 'Cert No', 'Amount']],
+                body: nomData,
+                theme: 'grid',
+                headStyles: { fillColor: [230, 230, 230], textColor: 0, fontSize: 8 },
+                margin: { left: 14, right: 14 }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // --- Declaration & Enclosures ---
+            if (y > 220) { doc.addPage(); y = 20; }
+            
+            doc.setFontSize(9);
+            doc.text("In support of my above declaration, I enclose:", leftX, y);
+            y += 5;
+            const enclosures = [
+                "1. Balance Sheet, Profit & Loss Account, Trading Account, Capital Account.",
+                "2. Copy of Employment Certificate with details of salary drawn.",
+                "3. Copies of Agreement / Revenue Records / Society Certificate in respect of properties.",
+                "4. Copies of Income Tax / Wealth Tax Returns / Assessment Order."
+            ];
+            enclosures.forEach(line => {
+                doc.text(line, leftX + 5, y);
+                y += 5;
+            });
+
+            y += 5;
+            doc.setFont("helvetica", "bold");
+            doc.text("16. DECLARATION:", leftX, y);
+            y += 5;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            const declText = "I declare that I am / I am not (tick as applicable) a Director in any Bank. There is no litigation against me or the Firm/Co. in which I am the Proprietor / a Partner / a Director. The name of the Firm/Co. or the name of the Partners / Proprietor / Director of the Firm / Co. is not on the caution list of RBI / ECGC. The Proprietor / Partners / Directors of the Firm / Co. is/are not the Director in any Co-operative Bank. I also declare that the above information is complete, true and correct.";
+            const splitDecl = doc.splitTextToSize(declText, 180);
+            doc.text(splitDecl, leftX, y);
+            
+            y += splitDecl.length * 4 + 15;
+            
+            // Signature Area with Dynamic Place/Date
+            // FORCE UPPERCASE
+            const place = document.getElementById('signPlace').value.toUpperCase();
+            const date = document.getElementById('signDate').value.toUpperCase();
+            
+            doc.setFontSize(10);
+            doc.text(`Place: ${place ? place : '_________________'}`, leftX, y);
+            doc.text(`Date: ${date ? date : '_________________'}`, leftX, y + 6);
+            doc.text("Signature of Applicant", 150, y + 6);
+
+            doc.save('Bank_Form_135_Revised.pdf');
+        }
+    </script>
+</body>
+</html>
