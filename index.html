@@ -23,7 +23,7 @@
         .input-group { @apply mb-4; }
         .input-label { @apply block text-sm font-medium text-gray-700 mb-1; }
         
-        /* Updated Input Styles for Better Visibility - Darker BG and Border */
+        /* VISIBILITY FIX: Darker BG and Stronger Border for inputs */
         .form-input { 
             @apply w-full rounded-md border border-gray-400 bg-gray-100 shadow-sm p-2 text-sm transition-colors;
             @apply focus:bg-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500;
@@ -35,7 +35,7 @@
         .btn-primary { @apply bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition-colors font-medium shadow-sm flex items-center gap-2; }
         .btn-secondary { @apply bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm; }
         
-        /* Updated Table Input Styles - Darker BG */
+        /* VISIBILITY FIX: Table inputs */
         .table-input { 
             @apply w-full border border-gray-400 rounded bg-gray-100 p-1 text-sm transition-colors;
             @apply focus:ring-1 focus:ring-orange-500 focus:border-orange-500 focus:bg-white; 
@@ -82,7 +82,7 @@
             <div class="flex items-start gap-2">
                 <i class="fas fa-info-circle mt-1"></i>
                 <div>
-                    <strong>For GitHub Hosting:</strong> Upload your logo as <code>logo.png</code> to your repository. The app will try to load it automatically.
+                    <strong>For GitHub Hosting:</strong> Ensure a file named <code>logo.png</code> exists in your repository folder. The app will prioritize loading it.
                 </div>
             </div>
              <div class="flex items-start gap-2">
@@ -127,6 +127,7 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label">2. Age (Calculated) <span class="required-star">*</span></label>
+                        <!-- Changed to text to support "X years Y months" format -->
                         <input type="text" id="age" class="form-input bg-gray-200 text-gray-700 font-bold" readonly required placeholder="Auto-calculated">
                     </div>
                     <div class="input-group">
@@ -470,49 +471,53 @@
         let logoBase64 = "";
         let applicantPhotoBase64 = "";
 
-        // --- GITHUB HOSTING SETUP ---
-        // 1. Upload this file as 'index.html' to a GitHub repository.
-        // 2. Upload your logo image as 'logo.png' to the same folder.
-        // 3. Uncomment the line below to load the local file automatically on GitHub Pages.
-         const officialLogoUrl = "logo.png";
-        
-        // Default Fallback (Bank Website)
-        const officialLogoUrl = "https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png";
+        // URL configurations
+        const GITHUB_LOGO_PATH = "logo.png";
+        const REMOTE_LOGO_URL = "https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png";
 
         window.onload = function() {
+            // Attempt 1: Load from local/GitHub path (logo.png)
             const img = new Image();
             img.crossOrigin = "Anonymous";
+            
             img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                try {
-                    logoBase64 = canvas.toDataURL('image/png');
-                    updateLogoPreview(logoBase64);
-                } catch(e) {
-                    console.log("CORS prevented auto-converting official logo.");
-                }
+                // Success loading local logo
+                convertAndSetLogo(img);
             };
+
             img.onerror = function() {
-                // If official URL fails, try local fallback just in case
-                if (officialLogoUrl.startsWith('http')) {
-                    console.log("Remote logo failed, trying local...");
-                    const localImg = new Image();
-                    localImg.src = "logo.png";
-                    localImg.onload = function() {
-                         const canvas = document.createElement('canvas');
-                         canvas.width = localImg.width;
-                         canvas.height = localImg.height;
-                         const ctx = canvas.getContext('2d');
-                         ctx.drawImage(localImg, 0, 0);
-                         logoBase64 = canvas.toDataURL('image/png');
-                         updateLogoPreview(logoBase64);
-                    }
-                }
-            }
-            img.src = officialLogoUrl;
+                // Failure loading local logo, try remote
+                console.log("Local logo.png not found, trying remote URL...");
+                loadRemoteLogo();
+            };
+
+            img.src = GITHUB_LOGO_PATH;
+        }
+
+        function loadRemoteLogo() {
+            const remoteImg = new Image();
+            remoteImg.crossOrigin = "Anonymous";
+            remoteImg.onload = function() {
+                convertAndSetLogo(remoteImg);
+            };
+            remoteImg.onerror = function() {
+                console.log("Could not load logo automatically. Please use upload button.");
+            };
+            remoteImg.src = REMOTE_LOGO_URL;
+        }
+
+        function convertAndSetLogo(imgElement) {
+             const canvas = document.createElement('canvas');
+             canvas.width = imgElement.width;
+             canvas.height = imgElement.height;
+             const ctx = canvas.getContext('2d');
+             ctx.drawImage(imgElement, 0, 0);
+             try {
+                 logoBase64 = canvas.toDataURL('image/png');
+                 updateLogoPreview(logoBase64);
+             } catch(e) {
+                 console.log("CORS prevented Canvas export.");
+             }
         }
 
         function updateLogoPreview(base64) {
