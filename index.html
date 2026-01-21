@@ -44,18 +44,14 @@
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <!-- Placeholder/Preview Logo Display -->
-                <img id="logoPreview" src="" class="h-10 w-auto bg-white rounded p-1 object-contain">
+                <img id="logoPreview" src="" class="h-10 w-auto bg-white rounded p-1 object-contain hidden">
+                <div class="bg-white text-orange-700 p-1.5 rounded font-bold text-xl" id="defaultLogoIcon">B</div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">Bank of Baroda</h1>
                     <p class="text-xs text-orange-100 opacity-90">Form No. 135 Digital Assistant</p>
                 </div>
             </div>
             <div class="flex gap-2">
-                 <!-- File Upload for Logo -->
-                <label class="bg-orange-600 border border-orange-400 text-white px-3 py-2 rounded shadow hover:bg-orange-500 cursor-pointer text-sm flex items-center gap-2">
-                    <i class="fas fa-image"></i> Upload Logo
-                    <input type="file" id="logoUpload" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
-                </label>
                 <button onclick="generatePDF()" class="bg-white text-orange-700 px-4 py-2 rounded shadow hover:bg-orange-50 font-bold transition flex items-center gap-2">
                     <i class="fas fa-file-pdf"></i> Download PDF
                 </button>
@@ -66,17 +62,36 @@
     <!-- Main Content -->
     <div class="max-w-6xl mx-auto px-4 py-8">
         
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-yellow-800 text-sm">
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-yellow-800 text-sm grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex items-start gap-2">
                 <i class="fas fa-info-circle mt-1"></i>
                 <div>
-                    <strong>Logo Setup:</strong> A default high-quality logo has been generated automatically.
-                    If you prefer the official file, 
-                    <a href="https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png" target="_blank" class="underline font-bold text-orange-600">click here to download</a> 
-                    and use the "Upload Logo" button.
-                    <br>
-                    <strong>Note:</strong> All dates in the PDF will be formatted as <strong>DD-MM-YYYY</strong>.
+                    <strong>Logo:</strong> The app loads the official logo. If it fails, <a href="https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png" target="_blank" class="underline font-bold text-orange-600">download it here</a> and upload below.
                 </div>
+            </div>
+             <div class="flex items-start gap-2">
+                <i class="fas fa-camera mt-1"></i>
+                <div>
+                    <strong>Photo:</strong> You can optionally upload an applicant photo to be printed in the form box.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upload Controls -->
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex flex-wrap gap-4 items-center">
+             <label class="bg-gray-100 text-gray-700 px-3 py-2 rounded border hover:bg-gray-200 cursor-pointer text-sm flex items-center gap-2">
+                <i class="fas fa-image text-orange-600"></i> Upload Bank Logo
+                <input type="file" id="logoUpload" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
+            </label>
+            
+            <label class="bg-gray-100 text-gray-700 px-3 py-2 rounded border hover:bg-gray-200 cursor-pointer text-sm flex items-center gap-2">
+                <i class="fas fa-user-circle text-orange-600"></i> Upload Applicant Photo
+                <input type="file" id="photoUpload" accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
+            </label>
+            
+            <div id="photoPreviewContainer" class="hidden flex items-center gap-2 text-xs text-green-600 font-bold">
+                 <i class="fas fa-check-circle"></i> Photo Loaded
+                 <img id="applicantPhotoPreview" class="h-8 w-8 object-cover rounded-full border">
             </div>
         </div>
 
@@ -435,73 +450,12 @@
         const { jsPDF } = window.jspdf;
 
         let logoBase64 = "";
+        let applicantPhotoBase64 = "";
 
-        // --- Synthetic Logo Generator (Vermilion Sun + Text) ---
-        function generateDefaultLogo() {
-            const canvas = document.createElement('canvas');
-            // Aspect Ratio 317x130
-            canvas.width = 634;
-            canvas.height = 260;
-            const ctx = canvas.getContext('2d');
-            
-            // Clear
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // 1. Draw Vermilion Sun (Icon) - Left Side
-            const sunColor = "#E55A26"; // Bank of Baroda Vermilion
-            const cx = 130;
-            const cy = 130;
-            const r = 100;
+        // Attempt to fetch Official Logo
+        const officialLogoUrl = "https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png";
 
-            // Draw Rays/Sun - Stylized
-            ctx.fillStyle = sunColor;
-            
-            // Central circle
-            ctx.beginPath();
-            ctx.arc(cx, cy, r * 0.6, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            // Rays (Simple representation of the 'Baroda Sun')
-            ctx.lineWidth = 15;
-            ctx.strokeStyle = sunColor;
-            for(let i=0; i<12; i++) {
-                const angle = (i * 30) * Math.PI / 180;
-                ctx.beginPath();
-                ctx.moveTo(cx + Math.cos(angle)*(r*0.7), cy + Math.sin(angle)*(r*0.7));
-                ctx.lineTo(cx + Math.cos(angle)*r, cy + Math.sin(angle)*r);
-                ctx.stroke();
-            }
-            
-            // Text "B" in the middle (optional, style choice)
-            ctx.fillStyle = "white";
-            ctx.font = "bold 80px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("B", cx, cy);
-
-            // 2. Draw Text "Bank of Baroda" - Right Side
-            ctx.fillStyle = sunColor;
-            ctx.font = "bold 70px Arial"; // Adjust size
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillText("Bank of Baroda", 260, 100);
-
-            // 3. Draw Tagline "India's International Bank"
-            ctx.fillStyle = "#333";
-            ctx.font = "40px Arial";
-            ctx.fillText("India's International Bank", 260, 160);
-
-            return canvas.toDataURL('image/png');
-        }
-
-        // Initialize Logo on Load
         window.onload = function() {
-            // 1. Generate Synthetic Logo immediately (No CORS, No wait)
-            logoBase64 = generateDefaultLogo();
-            updateLogoPreview(logoBase64);
-
-            // 2. Attempt to fetch Official Logo (Might fail due to CORS, but we have backup)
-            const officialLogoUrl = "https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png";
             const img = new Image();
             img.crossOrigin = "Anonymous";
             img.onload = function() {
@@ -513,14 +467,10 @@
                 try {
                     logoBase64 = canvas.toDataURL('image/png');
                     updateLogoPreview(logoBase64);
-                    console.log("Official logo loaded successfully.");
                 } catch(e) {
-                    console.log("CORS prevented auto-converting official logo. Using generated default.");
+                    console.log("CORS prevented auto-converting official logo.");
                 }
             };
-            img.onerror = function() {
-                 console.log("Could not load official logo image. Using generated default.");
-            }
             img.src = officialLogoUrl;
         }
 
@@ -528,6 +478,7 @@
             const previewImg = document.getElementById('logoPreview');
             previewImg.src = base64;
             previewImg.classList.remove('hidden');
+            document.getElementById('defaultLogoIcon').classList.add('hidden');
         }
 
         function handleLogoUpload(input) {
@@ -541,10 +492,22 @@
             }
         }
 
-        // --- Date Formatter (YYYY-MM-DD -> DD-MM-YYYY) ---
+        function handlePhotoUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    applicantPhotoBase64 = e.target.result;
+                    document.getElementById('applicantPhotoPreview').src = applicantPhotoBase64;
+                    document.getElementById('photoPreviewContainer').classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- Date Formatter ---
         function formatDate(dateString) {
             if(!dateString) return "";
-            const parts = dateString.split("-"); // Browser date inputs always return YYYY-MM-DD
+            const parts = dateString.split("-");
             if (parts.length === 3) {
                 return `${parts[2]}-${parts[1]}-${parts[0]}`;
             }
@@ -654,7 +617,6 @@
             `;
         }
 
-        // --- Address Logic ---
         function handleAddressChange(selectElement) {
             const row = selectElement.closest('tr');
             const addrInput = row.querySelector('.heir-addr');
@@ -681,23 +643,16 @@
             });
         }
 
-        // --- Net Worth Calculation ---
         function calculateNetWorth() {
             let totalAssets = 0;
             let totalLiab = 0;
-
-            // Sum all inputs with class 'asset-val'
             document.querySelectorAll('.asset-val').forEach(input => {
                 totalAssets += Number(input.value) || 0;
             });
-
-            // Sum all inputs with class 'liab-val'
             document.querySelectorAll('.liab-val').forEach(input => {
                 totalLiab += Number(input.value) || 0;
             });
-
             const netWorth = totalAssets - totalLiab;
-
             document.getElementById('dispTotalAssets').innerText = '₹ ' + totalAssets.toLocaleString('en-IN');
             document.getElementById('dispTotalLiab').innerText = '₹ ' + totalLiab.toLocaleString('en-IN');
             document.getElementById('dispNetWorth').innerText = '₹ ' + netWorth.toLocaleString('en-IN');
@@ -714,7 +669,6 @@
             }
         }
 
-        // Initialize rows
         addImmovableRow();
         addLicRow();
         addBankRow();
@@ -724,8 +678,6 @@
         addNominationRow();
         toggleOccupationFields();
 
-        // --- Helper to get table data ---
-        // MODIFIED: Automatically converts text to UPPERCASE and Formats Dates
         function getTableData(tableId) {
             const rows = document.querySelectorAll(`#${tableId} tbody tr`);
             const data = [];
@@ -734,18 +686,13 @@
                 const rowData = [];
                 let hasData = false;
                 inputs.forEach(input => {
-                    // Skip the select dropdown in heirs, we just want the text address
                     if(tableId === 'heirTable' && input.tagName === 'SELECT') return; 
-                    
                     let val = input.value || '';
                     if(val) {
                         hasData = true;
-                        
-                        // Check if it is a date input
                         if(input.type === 'date') {
                              val = formatDate(val);
                         } else {
-                             // FORCE UPPERCASE FOR PDF
                              val = String(val).toUpperCase();
                         }
                     }
@@ -756,7 +703,6 @@
             return data;
         }
 
-        // --- PDF GENERATION ---
         function generatePDF() {
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
@@ -767,58 +713,79 @@
             doc.text("ANNEXURE - I", 160, 10);
             doc.text("F.NO.: 135", 160, 15);
 
-            // LOGO & TITLE
-            // Replaced Text with Center-Aligned Logo
+            // LOGO Left Side
             if(logoBase64) {
                 try {
-                    // Aspect Ratio 317x130 (approx 2.44)
-                    // Fitting into header: Width 50mm, Height ~20.5mm
-                    // Centered: (pageWidth - width) / 2
-                    const imgWidth = 50; 
-                    const imgHeight = 50 / 2.44; 
-                    const xPos = (pageWidth - imgWidth) / 2;
+                    // Previous width 50mm, requested 1.5x bigger = 75mm
+                    // Maintain aspect ratio ~2.44
+                    const imgWidth = 75; 
+                    const imgHeight = 75 / 2.44; 
                     
-                    doc.addImage(logoBase64, 'PNG', xPos, 12, imgWidth, imgHeight);
+                    doc.addImage(logoBase64, 'PNG', 10, 12, imgWidth, imgHeight);
                 } catch(e) {
                     console.error("Logo Error", e);
                 }
             }
-            
-            // Text branding removed as requested
 
+            // TEXT HEADER (Restored)
+            doc.setTextColor(233, 84, 14); // Vermilion
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("Bank of Baroda", pageWidth/2, 25, { align: "center" });
+            
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text("(Head Office: Mandvi, Baroda)", pageWidth/2, 35, { align: "center" }); // Moved down slightly
+            doc.text("(Head Office: Mandvi, Baroda)", pageWidth/2, 32, { align: "center" });
 
             doc.setLineWidth(0.5);
-            doc.line(10, 38, 200, 38);
+            doc.line(10, 42, 200, 42);
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text("PARTICULARS TO BE SUPPLIED BY THE APPLICANT / GUARANTOR", pageWidth/2, 45, { align: "center" });
-            doc.line(10, 48, 200, 48);
+            doc.text("PARTICULARS TO BE SUPPLIED BY THE APPLICANT / GUARANTOR", pageWidth/2, 48, { align: "center" });
+            doc.line(10, 50, 200, 50);
 
-            let y = 58;
+            let y = 60;
             const leftX = 14;
             const valueX = 80;
             const lineHeight = 6;
+
+            // --- PHOTO BOX ---
+            // Draw box on the right side
+            const photoX = 160;
+            const photoY = 55;
+            const photoW = 35;
+            const photoH = 45;
+            
+            if (applicantPhotoBase64) {
+                 try {
+                    doc.addImage(applicantPhotoBase64, 'JPEG', photoX, photoY, photoW, photoH);
+                    doc.rect(photoX, photoY, photoW, photoH); // Border
+                } catch(e) {
+                     doc.rect(photoX, photoY, photoW, photoH);
+                     doc.setFontSize(8);
+                     doc.text("Photo", photoX + 10, photoY + 20);
+                }
+            } else {
+                doc.rect(photoX, photoY, photoW, photoH);
+                doc.setFontSize(8);
+                doc.text("Space for", photoX + 10, photoY + 20);
+                doc.text("Photo", photoX + 12, photoY + 25);
+            }
 
             // --- Personal Details ---
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
 
-            // Helper with Uppercase conversion
             function printField(label, value, yPos) {
                 doc.setFont("helvetica", "bold");
                 doc.text(label, leftX, yPos);
                 doc.setFont("helvetica", "normal");
-                // FORCE UPPERCASE
                 const val = value ? String(value).toUpperCase() : "";
                 doc.text(":  " + val, valueX, yPos);
             }
 
-            // Format date specifically for DOB
             function printDateField(label, value, yPos) {
                 doc.setFont("helvetica", "bold");
                 doc.text(label, leftX, yPos);
@@ -833,7 +800,6 @@
             printField("4. Qualification", document.getElementById('qualification').value, y); y += lineHeight;
             printField("5. Father's Name", document.getElementById('relName').value, y); y += lineHeight;
 
-            // Address Box
             y += 2;
             const addrY = y;
             doc.setFont("helvetica", "bold");
@@ -847,7 +813,6 @@
             doc.text("PRESENT RESI.", 127, addrY + 4);
             
             doc.setFont("helvetica", "normal");
-            // FORCE UPPERCASE
             const permAddr = doc.splitTextToSize(document.getElementById('permAddress').value.toUpperCase(), 70);
             const presAddr = doc.splitTextToSize(document.getElementById('currAddress').value.toUpperCase(), 70);
             doc.text(permAddr, 47, addrY + 9);
@@ -858,9 +823,7 @@
             const phones = `Office: ${document.getElementById('telOffice').value}   Resi: ${document.getElementById('telResi').value}   Mobile: ${document.getElementById('mobile').value}`;
             printField("7. Telephone Nos.", phones, y); y += lineHeight;
 
-            // Occupation
             const occType = document.getElementById('occType').value;
-            // FORCE UPPERCASE
             let occDetails = occType === 'service' 
                 ? `Service at ${document.getElementById('employerName').value.toUpperCase()}, ${document.getElementById('designation').value.toUpperCase()}`
                 : `Business: ${document.getElementById('firmName').value.toUpperCase()} (${document.getElementById('activity').value.toUpperCase()})`;
@@ -869,13 +832,11 @@
             printField("9. Annual Income", "Rs. " + document.getElementById('income').value, y); y += lineHeight;
             printField("10. PAN", document.getElementById('pan').value, y); y += lineHeight;
 
-            // --- 11. Assets ---
             y += 5;
             doc.setFont("helvetica", "bold");
             doc.text("11. DETAILS OF ASSETS", leftX, y);
             y += 5;
 
-            // 11.1 Immovable (Table)
             doc.setFontSize(9);
             doc.text("11.1 Immovable Properties:", leftX, y);
             const immData = getTableData('immovableTable');
@@ -890,11 +851,9 @@
             });
             y = doc.lastAutoTable.finalY + 6;
 
-            // 11.2 Movable
             doc.text("11.2 Movable Properties:", leftX, y);
             y += 4;
             
-            // LIC
             doc.setFontSize(8);
             doc.text("(A) LIC Policies", leftX + 5, y);
             const licData = getTableData('licTable');
@@ -910,7 +869,6 @@
                 y = doc.lastAutoTable.finalY + 5;
             } else y += 5;
 
-            // Banks
             doc.text("(B) Deposits / Bank Accounts", leftX + 5, y);
             const bankData = getTableData('bankTable');
             if (bankData.length > 0) {
@@ -925,7 +883,6 @@
                 y = doc.lastAutoTable.finalY + 5;
             } else y += 5;
 
-            // Vehicles (Table)
             doc.setFontSize(9);
             doc.text("11.3 Vehicles:", leftX, y);
             const vehData = getTableData('vehicleTable');
@@ -941,10 +898,8 @@
                 y = doc.lastAutoTable.finalY + 8;
             } else y += 10;
 
-            // Check page break
             if (y > 240) { doc.addPage(); y = 20; }
 
-            // --- 12. Liabilities ---
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
             doc.text("12. DETAILS OF LOANS / LIABILITIES", leftX, y);
@@ -959,36 +914,48 @@
             });
             y = doc.lastAutoTable.finalY + 10;
 
+            if (y > 250) { doc.addPage(); y = 20; }
+
             // --- Net Worth Summary ---
             doc.setDrawColor(0);
-            doc.setLineWidth(0.1);
-            doc.rect(14, y, 180, 15);
-            doc.setFontSize(11);
-            doc.text("NET WORTH SUMMARY", 20, y + 10);
-            
+            doc.setLineWidth(0.5);
+            doc.rect(14, y, 180, 25); // Increased height
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("NET WORTH SUMMARY", 16, y + 6);
+            doc.line(14, y+8, 194, y+8);
+
             const netWorth = document.getElementById('dispNetWorth').innerText;
             const totAssets = document.getElementById('dispTotalAssets').innerText;
             const totLiab = document.getElementById('dispTotalLiab').innerText;
             
-            doc.setFontSize(9);
-            doc.text(`Total Assets: ${totAssets}`, 80, y + 6);
-            doc.text(`Total Liab: ${totLiab}`, 80, y + 11);
-            doc.setFontSize(12);
-            doc.text(`Net Worth: ${netWorth}`, 140, y + 9);
+            let summaryY = y + 14;
             
-            y += 25;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`Total Assets:`, 20, summaryY);
+            doc.text(totAssets, 180, summaryY, { align: "right" });
+            
+            summaryY += 5;
+            doc.text(`Total Liabilities:`, 20, summaryY);
+            doc.text(totLiab, 180, summaryY, { align: "right" });
+            
+            summaryY += 6;
+            doc.setFont("helvetica", "bold");
+            doc.text(`Net Worth:`, 20, summaryY);
+            doc.text(netWorth, 180, summaryY, { align: "right" });
+            
+            y += 35; // Move y down past the box
 
-            // --- 13. Other Details ---
             if (y > 250) { doc.addPage(); y = 20; }
             doc.setFontSize(10);
-            doc.text("13. OTHER DETAILS (Guarantees given):", leftX, y);
-            // FORCE UPPERCASE
-            const guarantee = doc.splitTextToSize(document.getElementById('guaranteeDetails').value.toUpperCase(), 170);
             doc.setFont("helvetica", "normal");
+            doc.text("13. OTHER DETAILS (Guarantees given):", leftX, y);
+            const guarantee = doc.splitTextToSize(document.getElementById('guaranteeDetails').value.toUpperCase(), 170);
             doc.text(guarantee, leftX + 5, y + 6);
             y += (guarantee.length * 5) + 10;
 
-            // --- 14. Heirs ---
             if (y > 250) { doc.addPage(); y = 20; }
             doc.setFont("helvetica", "bold");
             doc.text("14. PARTICULARS OF LEGAL HEIRS", leftX, y);
@@ -1003,7 +970,6 @@
             });
             y = doc.lastAutoTable.finalY + 8;
 
-            // --- 15. Nomination ---
             if (y > 240) { doc.addPage(); y = 20; }
             doc.text("15. NOMINATION PARTICULARS", leftX, y);
             const nomData = getTableData('nominationTable');
@@ -1017,7 +983,6 @@
             });
             y = doc.lastAutoTable.finalY + 10;
 
-            // --- Declaration & Enclosures ---
             if (y > 220) { doc.addPage(); y = 20; }
             
             doc.setFontSize(9);
@@ -1046,10 +1011,7 @@
             
             y += splitDecl.length * 4 + 15;
             
-            // Signature Area with Dynamic Place/Date
-            // FORCE UPPERCASE
             const place = document.getElementById('signPlace').value.toUpperCase();
-            // FORMAT DATE DD-MM-YYYY
             const date = formatDate(document.getElementById('signDate').value);
             
             doc.setFontSize(10);
