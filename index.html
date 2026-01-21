@@ -23,9 +23,9 @@
         .input-group { @apply mb-4; }
         .input-label { @apply block text-sm font-medium text-gray-700 mb-1; }
         
-        /* Updated Input Styles for Better Visibility */
+        /* Updated Input Styles for Better Visibility - Darker BG and Border */
         .form-input { 
-            @apply w-full rounded-md border border-gray-300 bg-gray-50 shadow-sm p-2 text-sm transition-colors;
+            @apply w-full rounded-md border border-gray-400 bg-gray-100 shadow-sm p-2 text-sm transition-colors;
             @apply focus:bg-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500;
         }
         
@@ -35,9 +35,9 @@
         .btn-primary { @apply bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition-colors font-medium shadow-sm flex items-center gap-2; }
         .btn-secondary { @apply bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm; }
         
-        /* Updated Table Input Styles */
+        /* Updated Table Input Styles - Darker BG */
         .table-input { 
-            @apply w-full border border-gray-200 rounded bg-gray-50 p-1 text-sm transition-colors;
+            @apply w-full border border-gray-400 rounded bg-gray-100 p-1 text-sm transition-colors;
             @apply focus:ring-1 focus:ring-orange-500 focus:border-orange-500 focus:bg-white; 
         }
         
@@ -128,7 +128,7 @@
                     <div class="input-group">
                         <label class="input-label">2. Age (Calculated) <span class="required-star">*</span></label>
                         <!-- Changed to text to support "X years Y months" format -->
-                        <input type="text" id="age" class="form-input bg-gray-100 text-gray-600 font-semibold" readonly required placeholder="Auto-calculated">
+                        <input type="text" id="age" class="form-input bg-gray-200 text-gray-700 font-bold" readonly required placeholder="Auto-calculated">
                     </div>
                     <div class="input-group">
                         <label class="input-label">4. Qualification <span class="required-star">*</span></label>
