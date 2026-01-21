@@ -23,12 +23,15 @@
         .input-group { @apply mb-4; }
         .input-label { @apply block text-sm font-medium text-gray-700 mb-1; }
         .form-input { @apply w-full rounded-md border-gray-300 border shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 text-sm; }
+        /* Style for invalid inputs after submission attempt */
+        .form-input:invalid { @apply border-red-500 ring-1 ring-red-500; }
         .btn-primary { @apply bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition-colors font-medium shadow-sm flex items-center gap-2; }
         .btn-secondary { @apply bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm; }
         .table-input { @apply w-full border-none bg-transparent p-1 focus:ring-1 focus:ring-orange-500 text-sm; }
         .calc-box { @apply bg-gray-50 p-4 rounded border border-gray-200 text-center; }
         .calc-label { @apply text-xs font-bold text-gray-500 uppercase tracking-wide; }
         .calc-value { @apply text-xl font-bold text-gray-800; }
+        .required-star { @apply text-red-500 ml-1; }
         
         /* Custom scrollbar for tables */
         .table-container { @apply overflow-x-auto border rounded-md border-gray-200 mb-2; }
@@ -52,7 +55,7 @@
                 </div>
             </div>
             <div class="flex gap-2">
-                <button onclick="generatePDF()" class="bg-white text-orange-700 px-4 py-2 rounded shadow hover:bg-orange-50 font-bold transition flex items-center gap-2">
+                <button onclick="validateAndGenerate()" class="bg-white text-orange-700 px-4 py-2 rounded shadow hover:bg-orange-50 font-bold transition flex items-center gap-2">
                     <i class="fas fa-file-pdf"></i> Download PDF
                 </button>
             </div>
@@ -102,32 +105,33 @@
                 <h2 class="section-title"><i class="fas fa-user"></i> 1-5. Personal Details</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="input-group md:col-span-2">
-                        <label class="input-label">1. Name in Full</label>
-                        <input type="text" id="fullName" class="form-input" placeholder="First Middle Last">
+                        <label class="input-label">1. Name in Full <span class="required-star">*</span></label>
+                        <input type="text" id="fullName" class="form-input" placeholder="First Middle Last" required>
                     </div>
                     <div class="input-group">
-                        <label class="input-label">2. Age</label>
-                        <input type="number" id="age" class="form-input">
+                        <label class="input-label">3. Date of Birth <span class="required-star">*</span></label>
+                        <input type="date" id="dob" class="form-input" onchange="calculateAge()" required>
                     </div>
                     <div class="input-group">
-                        <label class="input-label">3. Date of Birth</label>
-                        <input type="date" id="dob" class="form-input">
+                        <label class="input-label">2. Age (Calculated) <span class="required-star">*</span></label>
+                        <!-- Changed to text to support "X years Y months" format -->
+                        <input type="text" id="age" class="form-input bg-gray-50" readonly required placeholder="Auto-calculated">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">4. Qualification</label>
-                        <input type="text" id="qualification" class="form-input">
+                        <label class="input-label">4. Qualification <span class="required-star">*</span></label>
+                        <input type="text" id="qualification" class="form-input" required>
                     </div>
                     <div class="input-group">
-                        <label class="input-label">5. Father's / Husband's Name</label>
-                        <input type="text" id="relName" class="form-input">
+                        <label class="input-label">5. Father's / Husband's Name <span class="required-star">*</span></label>
+                        <input type="text" id="relName" class="form-input" required>
                     </div>
                     <div class="input-group">
                         <label class="input-label">10. PAN Number</label>
                         <input type="text" id="pan" class="form-input uppercase">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">9. Annual Income (Rs.)</label>
-                        <input type="number" id="income" class="form-input calc-trigger">
+                        <label class="input-label">9. Annual Income (Rs.) <span class="required-star">*</span></label>
+                        <input type="number" id="income" class="form-input calc-trigger" required>
                     </div>
                 </div>
             </div>
@@ -137,12 +141,14 @@
                 <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> 6-7. Contact Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="input-label font-bold text-gray-900 mb-2 block">Permanent Residential Address</label>
-                        <textarea id="permAddress" rows="3" class="form-input"></textarea>
+                        <label class="input-label font-bold text-gray-900 mb-2 block">Permanent Residential Address <span class="required-star">*</span></label>
+                        <textarea id="permAddress" rows="3" class="form-input" required minlength="20" placeholder="Minimum 20 characters"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Min. 20 chars</p>
                     </div>
                     <div>
-                        <label class="input-label font-bold text-gray-900 mb-2 block">Present Residential Address</label>
-                        <textarea id="currAddress" rows="3" class="form-input" onchange="updateHeirAddresses()"></textarea>
+                        <label class="input-label font-bold text-gray-900 mb-2 block">Present Residential Address <span class="required-star">*</span></label>
+                        <textarea id="currAddress" rows="3" class="form-input" onchange="updateHeirAddresses()" required minlength="20" placeholder="Minimum 20 characters"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Min. 20 chars</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -155,8 +161,8 @@
                         <input type="tel" id="telResi" class="form-input">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">Mobile</label>
-                        <input type="tel" id="mobile" class="form-input">
+                        <label class="input-label">Mobile <span class="required-star">*</span></label>
+                        <input type="tel" id="mobile" class="form-input" required>
                     </div>
                 </div>
             </div>
@@ -437,7 +443,7 @@
 
             <!-- Footer Action -->
             <div class="flex justify-center mt-8 mb-12">
-                <button type="button" onclick="generatePDF()" class="bg-orange-600 text-white px-8 py-4 rounded-lg shadow-lg hover:bg-orange-700 transition transform hover:-translate-y-1 font-bold text-lg flex items-center gap-3">
+                <button type="button" onclick="validateAndGenerate()" class="bg-orange-600 text-white px-8 py-4 rounded-lg shadow-lg hover:bg-orange-700 transition transform hover:-translate-y-1 font-bold text-lg flex items-center gap-3">
                     <i class="fas fa-file-pdf fa-lg"></i> Generate & Download Form 135
                 </button>
             </div>
@@ -512,6 +518,38 @@
                 return `${parts[2]}-${parts[1]}-${parts[0]}`;
             }
             return dateString;
+        }
+
+        // --- Calculate Age Logic ---
+        function calculateAge() {
+            const dobInput = document.getElementById('dob').value;
+            if (!dobInput) return;
+
+            const dob = new Date(dobInput);
+            const today = new Date();
+
+            let ageYears = today.getFullYear() - dob.getFullYear();
+            let ageMonths = today.getMonth() - dob.getMonth();
+            let ageDays = today.getDate() - dob.getDate();
+
+            // Adjust months and years if needed
+            if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
+                ageYears--;
+                ageMonths += 12;
+            }
+            
+            // Further granular adjustment for days
+            if (ageDays < 0) {
+                ageMonths--;
+                // Handle negative month after day adjustment
+                if(ageMonths < 0) {
+                    ageMonths += 12;
+                    // Do not subtract year again, handled above
+                }
+            }
+
+            const ageString = `${ageYears} years ${ageMonths} months`;
+            document.getElementById('age').value = ageString;
         }
 
         // --- Row Management Functions ---
@@ -703,6 +741,16 @@
             return data;
         }
 
+        // --- VALIDATION & GENERATION WRAPPER ---
+        function validateAndGenerate() {
+            const form = document.getElementById('bankForm');
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Triggers browser validation UI
+                return;
+            }
+            generatePDF();
+        }
+
         function generatePDF() {
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
@@ -716,11 +764,8 @@
             // LOGO Left Side
             if(logoBase64) {
                 try {
-                    // Previous width 50mm, requested 1.5x bigger = 75mm
-                    // Maintain aspect ratio ~2.44
                     const imgWidth = 75; 
                     const imgHeight = 75 / 2.44; 
-                    
                     doc.addImage(logoBase64, 'PNG', 10, 12, imgWidth, imgHeight);
                 } catch(e) {
                     console.error("Logo Error", e);
@@ -752,17 +797,15 @@
             const lineHeight = 6;
 
             // --- PHOTO BOX ---
-            // Draw box on the right side
-            // MOVED UP to avoid overlap with address
             const photoX = 160;
-            const photoY = 52; // Adjusted up from 55
+            const photoY = 52;
             const photoW = 35;
             const photoH = 45;
             
             if (applicantPhotoBase64) {
                  try {
                     doc.addImage(applicantPhotoBase64, 'JPEG', photoX, photoY, photoW, photoH);
-                    doc.rect(photoX, photoY, photoW, photoH); // Border
+                    doc.rect(photoX, photoY, photoW, photoH); 
                 } catch(e) {
                      doc.rect(photoX, photoY, photoW, photoH);
                      doc.setFontSize(8);
@@ -802,7 +845,6 @@
             printField("5. Father's Name", document.getElementById('relName').value, y); y += lineHeight;
 
             // Explicitly push address down to avoid photo overlap
-            // Photo bottom is 52 + 45 = 97. We set y to 105 to clear it safely.
             y = 105;
             const addrY = y;
             doc.setFont("helvetica", "bold");
@@ -922,7 +964,7 @@
             // --- Net Worth Summary ---
             doc.setDrawColor(0);
             doc.setLineWidth(0.5);
-            doc.rect(14, y, 180, 25); // Increased height
+            doc.rect(14, y, 180, 25); 
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
@@ -949,7 +991,7 @@
             doc.text(`Net Worth:`, 20, summaryY);
             doc.text(netWorth, 180, summaryY, { align: "right" });
             
-            y += 35; // Move y down past the box
+            y += 35; 
 
             if (y > 250) { doc.addPage(); y = 20; }
             doc.setFontSize(10);
