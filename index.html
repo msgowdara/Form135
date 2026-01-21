@@ -801,44 +801,47 @@
             doc.text("ANNEXURE - I", 160, 10);
             doc.text("F.NO.: 135", 160, 15);
 
-            // LOGO Left Side
+            // LOGO (CENTERED) & TEXT
+            // 1. Draw Logo
             if(logoBase64) {
                 try {
                     const imgWidth = 75; 
-                    const imgHeight = 75 / 2.44; 
-                    doc.addImage(logoBase64, 'PNG', 10, 12, imgWidth, imgHeight);
+                    const imgHeight = 75 / 2.44; // ~30.7mm
+                    const xPos = (pageWidth - imgWidth) / 2; // Center Align
+                    
+                    doc.addImage(logoBase64, 'PNG', xPos, 10, imgWidth, imgHeight);
                 } catch(e) {
                     console.error("Logo Error", e);
                 }
             }
 
-            // TEXT HEADER (Restored)
-            doc.setTextColor(233, 84, 14); // Vermilion
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(22);
-            doc.text("Bank of Baroda", pageWidth/2, 25, { align: "center" });
-            
+            // 2. Head Office Text (Centered below logo)
+            // Logo bottom is approx 10 + 30.7 = 40.7
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text("(Head Office: Mandvi, Baroda)", pageWidth/2, 32, { align: "center" });
+            doc.text("(Head Office: Mandvi, Baroda)", pageWidth/2, 46, { align: "center" });
 
+            // 3. Divider Lines
             doc.setLineWidth(0.5);
-            doc.line(10, 42, 200, 42);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("PARTICULARS TO BE SUPPLIED BY THE APPLICANT / GUARANTOR", pageWidth/2, 48, { align: "center" });
             doc.line(10, 50, 200, 50);
 
-            let y = 60;
+            // 4. Main Title
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("PARTICULARS TO BE SUPPLIED BY THE APPLICANT / GUARANTOR", pageWidth/2, 56, { align: "center" });
+            doc.line(10, 58, 200, 58);
+
+            // Start Content Y Position
+            let y = 65;
             const leftX = 14;
             const valueX = 80;
             const lineHeight = 6;
 
             // --- PHOTO BOX ---
+            // Adjust photo box to start at y=60 to clear the new header layout
             const photoX = 160;
-            const photoY = 52;
+            const photoY = 60;
             const photoW = 35;
             const photoH = 45;
             
@@ -907,7 +910,7 @@
             y += (lines * lineHeight);
 
             // Explicitly push address down to avoid photo overlap
-            y = 105;
+            y = 110; // Increased to 110 to account for potentially wrapped lines above
             const addrY = y;
             doc.setFont("helvetica", "bold");
             doc.text("6. Addresses", leftX, y + 5);
