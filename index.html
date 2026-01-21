@@ -753,8 +753,9 @@
 
             // --- PHOTO BOX ---
             // Draw box on the right side
+            // MOVED UP to avoid overlap with address
             const photoX = 160;
-            const photoY = 55;
+            const photoY = 52; // Adjusted up from 55
             const photoW = 35;
             const photoH = 45;
             
@@ -800,7 +801,9 @@
             printField("4. Qualification", document.getElementById('qualification').value, y); y += lineHeight;
             printField("5. Father's Name", document.getElementById('relName').value, y); y += lineHeight;
 
-            y += 2;
+            // Explicitly push address down to avoid photo overlap
+            // Photo bottom is 52 + 45 = 97. We set y to 105 to clear it safely.
+            y = 105;
             const addrY = y;
             doc.setFont("helvetica", "bold");
             doc.text("6. Addresses", leftX, y + 5);
