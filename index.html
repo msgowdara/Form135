@@ -604,15 +604,15 @@
                 <div class="grid grid-cols-3 gap-4">
                     <div class="calc-box">
                         <div class="calc-label">Total Assets (9.6)</div>
-                        <div class="calc-value text-green" id="dispTotalAssets">₹ 0</div>
+                        <div class="calc-value text-green" id="dispTotalAssets">Rs. 0</div>
                     </div>
                     <div class="calc-box">
                         <div class="calc-label">Total Liabilities</div>
-                        <div class="calc-value text-red" id="dispTotalLiab">₹ 0</div>
+                        <div class="calc-value text-red" id="dispTotalLiab">Rs. 0</div>
                     </div>
                     <div class="calc-box" style="border-color: #f97316;">
                         <div class="calc-label text-orange">Net Worth</div>
-                        <div class="calc-value" id="dispNetWorth">₹ 0</div>
+                        <div class="calc-value" id="dispNetWorth">Rs. 0</div>
                     </div>
                 </div>
             </div>
@@ -972,9 +972,9 @@
             let assets = 0, liabs = 0;
             document.querySelectorAll('.asset-val').forEach(i => assets += Number(i.value) || 0);
             document.querySelectorAll('.liab-val').forEach(i => liabs += Number(i.value) || 0);
-            document.getElementById('dispTotalAssets').innerText = '₹ ' + assets.toLocaleString('en-IN');
-            document.getElementById('dispTotalLiab').innerText = '₹ ' + liabs.toLocaleString('en-IN');
-            document.getElementById('dispNetWorth').innerText = '₹ ' + (assets - liabs).toLocaleString('en-IN');
+            document.getElementById('dispTotalAssets').innerText = 'Rs. ' + assets.toLocaleString('en-IN');
+            document.getElementById('dispTotalLiab').innerText = 'Rs. ' + liabs.toLocaleString('en-IN');
+            document.getElementById('dispNetWorth').innerText = 'Rs. ' + (assets - liabs).toLocaleString('en-IN');
         }
 
         function getTableData(id) {
@@ -1196,7 +1196,7 @@
             });
             y = doc.lastAutoTable.finalY + 5;
 
-            const totAssets = document.getElementById('dispTotalAssets').innerText.replace('₹', '').trim();
+            const totAssets = document.getElementById('dispTotalAssets').innerText.replace('Rs.', '').trim();
             doc.setFont("helvetica", "bold").text(`9.6 Total of all assets: Rs. ${totAssets}`, 14, y); y+=8;
 
             doc.text("10. Details of Loans:", 14, y);
@@ -1228,8 +1228,8 @@
             doc.setDrawColor(0); doc.setLineWidth(0.5); doc.rect(14, y, 180, 25);
             doc.setFontSize(10).text("NET WORTH SUMMARY", 16, y+6); doc.line(14, y+8, 194, y+8);
             
-            const liab = document.getElementById('dispTotalLiab').innerText.replace('₹', '').trim();
-            const net = document.getElementById('dispNetWorth').innerText.replace('₹', '').trim();
+            const liab = document.getElementById('dispTotalLiab').innerText.replace('Rs.', '').trim();
+            const net = document.getElementById('dispNetWorth').innerText.replace('Rs.', '').trim();
             
             let sumY = y+14;
             doc.setFont("helvetica", "normal");
@@ -1289,7 +1289,13 @@
             doc.text(`Signature of Applicant / Guarantor`, 130, y); y+=6;
             doc.text(`Date: ${signDate}`, 14, y);
 
-            doc.save('Form_135_New_Format.pdf');
+            // Handle output for App Inventor or Standard
+            if (window.AppInventor) {
+                const pdfData = doc.output('datauristring').split(',')[1];
+                window.AppInventor.setWebViewString(pdfData);
+            } else {
+                doc.save('Form_135_New_Format.pdf');
+            }
         }
     </script>
 </body>
