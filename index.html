@@ -25,8 +25,8 @@
             --primary: #ea580c; /* Orange */
             --primary-hover: #c2410c;
             --border: #374151;
-            --input-bg: #ffffff;
-            --input-text: #000000;
+            --input-bg: #f3f4f6; /* Light gray for inputs */
+            --input-text: #111827; /* Dark text for inputs */
         }
 
         body {
@@ -111,6 +111,7 @@
         .input-group { margin-bottom: 1rem; }
         .input-label { display: block; font-size: 0.875rem; color: #d1d5db; margin-bottom: 0.25rem; font-weight: 500; }
         
+        /* High Contrast Input Styling */
         .form-input {
             width: 100%;
             padding: 0.5rem;
@@ -119,15 +120,16 @@
             background-color: var(--input-bg);
             color: var(--input-text);
             font-size: 0.9rem;
-            font-weight: 500;
+            font-weight: 600; /* Bolder text for visibility */
         }
         .form-input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.3);
+            background-color: #ffffff;
         }
-        .form-input:read-only { background-color: #e5e7eb; color: #374151; }
-        .form-input:invalid { border-color: #ef4444; background-color: #fef2f2; }
+        .form-input:read-only { background-color: #9ca3af; color: #111827; cursor: not-allowed; }
+        .form-input:invalid { border-color: #ef4444; background-color: #fecaca; }
 
         /* Tables */
         .table-wrapper { overflow-x: auto; border: 1px solid var(--border); border-radius: 0.375rem; margin-bottom: 0.5rem; }
@@ -148,11 +150,12 @@
             border: 1px solid #9ca3af;
             border-radius: 0.25rem;
             padding: 0.25rem;
-            background-color: #ffffff;
-            color: #000;
+            background-color: var(--input-bg);
+            color: var(--input-text);
             font-size: 0.85rem;
+            font-weight: 500;
         }
-        .table-input:focus { outline: 2px solid var(--primary); }
+        .table-input:focus { outline: 2px solid var(--primary); background-color: #ffffff; }
 
         /* Buttons */
         .btn {
@@ -278,12 +281,12 @@
                         <input type="text" id="pob" class="form-input">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">3(a). Father's / Husband's Name <span class="required">*</span></label>
-                        <input type="text" id="fatherName" class="form-input" required>
+                        <label class="input-label">3(a). Father's / Husband's Name</label>
+                        <input type="text" id="fatherName" class="form-input">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">3(b). Mother's Name</label>
-                        <input type="text" id="motherName" class="form-input">
+                        <label class="input-label">3(b). Mother's Name <span class="required">*</span></label>
+                        <input type="text" id="motherName" class="form-input" required>
                     </div>
                 </div>
             </div>
@@ -295,26 +298,26 @@
                     <div>
                         <label class="input-label">4. Permanent Address <span class="required">*</span></label>
                         <textarea id="permAddress" rows="3" class="form-input" required minlength="20"></textarea>
-                        <input type="text" id="permPin" placeholder="Pin Code" class="form-input mt-2">
+                        <input type="text" id="permPin" placeholder="Pin Code" class="form-input mt-2" oninput="validateNumber(this)">
                     </div>
                     <div>
                         <label class="input-label">Present Address <span class="required">*</span></label>
                         <textarea id="currAddress" rows="3" class="form-input" required minlength="20"></textarea>
-                        <input type="text" id="currPin" placeholder="Pin Code" class="form-input mt-2">
+                        <input type="text" id="currPin" placeholder="Pin Code" class="form-input mt-2" oninput="validateNumber(this)">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-4 mt-4">
                     <div class="input-group">
                         <label class="input-label">5. Office/Shop Tel</label>
-                        <input type="text" id="telOffice" class="form-input">
+                        <input type="text" id="telOffice" class="form-input" oninput="validateNumber(this)">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Residence Tel</label>
-                        <input type="text" id="telResi" class="form-input">
+                        <input type="text" id="telResi" class="form-input" oninput="validateNumber(this)">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Mobile No <span class="required">*</span></label>
-                        <input type="text" id="mobile" class="form-input" required>
+                        <input type="text" id="mobile" class="form-input" required oninput="validateNumber(this)">
                     </div>
                 </div>
             </div>
@@ -346,7 +349,7 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label">Salary A/c No. (Savings Bank)</label>
-                        <input type="text" id="salaryAcc" class="form-input">
+                        <input type="text" id="salaryAcc" class="form-input" oninput="validateNumber(this)">
                     </div>
                 </div>
 
@@ -376,7 +379,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="input-group">
                         <label class="input-label">7. Annual Income (Rs.) <span class="required">*</span></label>
-                        <input type="number" id="income" class="form-input" required>
+                        <input type="text" id="income" class="form-input" required oninput="validateNumber(this)">
                     </div>
                     <div class="input-group">
                         <label class="input-label">8. PAN Number</label>
@@ -425,7 +428,7 @@
                                     <th>Sum Assured</th>
                                     <th>Branch</th>
                                     <th>Premium (Rs)</th>
-                                    <th>Paid Up To</th>
+                                    <th>Paid Up To (Date)</th>
                                     <th>Surrender Val (Net Worth)</th>
                                     <th class="w-8"></th>
                                 </tr>
@@ -447,7 +450,7 @@
                                     <th>No. Held</th>
                                     <th>Cert/Acc No</th>
                                     <th>Face Value (Total)</th>
-                                    <th>Paid? (Y/N)</th>
+                                    <th>Paid? (Yes/No)</th>
                                     <th>Mkt Value (Net Worth)</th>
                                     <th class="w-8"></th>
                                 </tr>
@@ -698,16 +701,19 @@
     </div>
 
     <script>
-        const { jsPDF } = window.jspdf;
-
-        // Configurations
-        const GITHUB_LOGO_PATH = "logo.png";
-        const REMOTE_LOGO_URL = "https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png";
+        // --- JS Logic ---
         let logoBase64 = "";
         let applicantPhotoBase64 = "";
 
-        // Init
+        const GITHUB_LOGO_PATH = "logo.png";
+        const REMOTE_LOGO_URL = "https://bankofbaroda.bank.in/about-us/-/media/Project/BOB/CountryWebsites/India/about-us/overview/BOB-New-Logo-2026-Eng.png";
+
         window.onload = function() {
+            // Check if jsPDF exists
+            if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+                console.error("jsPDF library not found. Please follow the offline instructions.");
+            }
+
             addImmovableRow();
             addLicRow();
             addShareRow();
@@ -722,7 +728,6 @@
             addNominationRow();
             toggleOccupationFields();
 
-            // Load Logo
             const img = new Image();
             img.crossOrigin = "Anonymous";
             img.onload = () => convertAndSetLogo(img);
@@ -773,7 +778,11 @@
             }
         }
 
-        // --- Helper Functions ---
+        function validateNumber(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            calculateNetWorth(); 
+        }
+
         function createDeleteBtn(onClick) {
             return `<button type="button" onclick="${onClick}; calculateNetWorth()" class="btn-del">X</button>`;
         }
@@ -844,8 +853,8 @@
                 <td><select class="table-input"><option>Plot</option><option>Agri Land</option><option>House</option><option>Other</option></select></td>
                 <td><input class="table-input" placeholder="Survey/Area"></td>
                 <td><input class="table-input" placeholder="Name"></td>
-                <td><input type="number" class="table-input" placeholder="0"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input" placeholder="0" oninput="validateNumber(this)"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td><input class="table-input"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
@@ -855,22 +864,22 @@
             tbody.insertRow().innerHTML = `
                 <td><input class="table-input" placeholder="No"></td>
                 <td><input type="date" class="table-input"></td>
-                <td><input type="number" class="table-input"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
                 <td><input class="table-input"></td>
-                <td><input type="number" class="table-input"></td>
-                <td><input class="table-input"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
+                <td><input type="date" class="table-input"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
         function addShareRow() { 
             document.querySelector('#shareTable tbody').insertRow().innerHTML = `
                 <td><input class="table-input" placeholder="Co Name"></td>
-                <td><input type="number" class="table-input"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
                 <td><input class="table-input"></td>
-                <td><input type="number" class="table-input"></td>
-                <td><input class="table-input" placeholder="Y/N"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
+                <td><select class="table-input"><option>Yes</option><option>No</option></select></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
@@ -879,10 +888,10 @@
                 <td><input class="table-input"></td>
                 <td><input type="date" class="table-input"></td>
                 <td><input class="table-input"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td><input class="table-input"></td>
                 <td><input type="date" class="table-input"></td>
-                <td><input type="number" class="table-input"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
@@ -891,9 +900,9 @@
                 <td><input class="table-input"></td>
                 <td><input type="date" class="table-input"></td>
                 <td><input class="table-input"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td><input type="date" class="table-input"></td>
-                <td><input type="number" class="table-input"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
@@ -901,22 +910,22 @@
             document.querySelector('#vehTable tbody').insertRow().innerHTML = `
                 <td><input class="table-input"></td>
                 <td><input class="table-input"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
         function addCapRow() { 
             document.querySelector('#capTable tbody').insertRow().innerHTML = `
                 <td><input class="table-input"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
         function addOtherInvRow() { 
             document.querySelector('#otherInvTable tbody').insertRow().innerHTML = `
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
-                <td><input type="number" class="table-input asset-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
+                <td><input type="text" class="table-input asset-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
@@ -925,8 +934,8 @@
                 <td><input class="table-input"></td>
                 <td><input class="table-input"></td>
                 <td><input class="table-input"></td>
-                <td><input type="number" class="table-input liab-val" placeholder="0" oninput="calculateNetWorth()"></td>
-                <td><input type="number" class="table-input liab-val" placeholder="0" oninput="calculateNetWorth()"></td>
+                <td><input type="text" class="table-input liab-val" placeholder="0" oninput="validateNumber(this)"></td>
+                <td><input type="text" class="table-input liab-val" placeholder="0" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
@@ -934,7 +943,7 @@
             document.querySelector('#guaranteeTable tbody').insertRow().innerHTML = `
                 <td><input class="table-input"></td>
                 <td><input class="table-input"></td>
-                <td><input class="table-input"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
                 <td><select class="table-input"><option>Standard</option><option>NPA</option></select></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
@@ -955,7 +964,7 @@
                 <td><input class="table-input"></td>
                 <td><input class="table-input"></td>
                 <td><input class="table-input"></td>
-                <td><input class="table-input"></td>
+                <td><input type="text" class="table-input" oninput="validateNumber(this)"></td>
                 <td class="text-center">${createDeleteBtn('this.closest("tr").remove()')}</td>`;
         }
 
@@ -978,12 +987,17 @@
         }
 
         function validateAndGenerate() {
+            if (!window.jspdf) {
+                alert("Error: jsPDF not found. Please ensure files are in the same folder.");
+                return;
+            }
             const form = document.getElementById('bankForm');
             if(form.checkValidity()) generatePDF();
             else form.reportValidity();
         }
 
         function generatePDF() {
+            const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
             let y = 15;
@@ -1006,29 +1020,29 @@
             const branch = document.getElementById('branchName').value.toUpperCase();
             doc.text(`BRANCH: ${branch}`, 14, y); y += 6;
 
-            // Title + Photo
+            // Title + Photo in Header (Top Right)
             const title = "PARTICULARS TO BE SUPPLIED BY APPLICANT/ Directors/ partners/ Prop. , Guarantor FOR ADVANCES";
             doc.setFont("helvetica", "bold");
             
-            const photoX = pageWidth - 14 - 35; 
-            const photoY = y - 5;
+            const photoW = 35;
+            const photoH = 45;
+            const photoX = pageWidth - 14 - photoW; 
+            const photoY = 15; // Placed at top right, near logo vertical start
             
-            doc.text(doc.splitTextToSize(title, 135), 14, y);
+            doc.text(doc.splitTextToSize(title, 130), 14, y);
             
             if (applicantPhotoBase64) {
-                 try { doc.addImage(applicantPhotoBase64, 'JPEG', photoX, photoY, 35, 45); } catch(e) {}
-                 doc.rect(photoX, photoY, 35, 45);
+                 try { doc.addImage(applicantPhotoBase64, 'JPEG', photoX, photoY, photoW, photoH); } catch(e) {}
+                 doc.rect(photoX, photoY, photoW, photoH);
             } else {
-                doc.rect(photoX, photoY, 35, 45);
+                doc.rect(photoX, photoY, photoW, photoH);
                 doc.setFontSize(8).text("Photo", photoX+12, photoY+25);
             }
             
-            y += 15; // Move past title
+            y += 15; 
             doc.setFontSize(10).setFont("helvetica", "normal");
             const asAt = formatDate(document.getElementById('asAtDate').value);
-            doc.text(`I give below the particulars of myself, my family and my Assets & Liabilities as at ${asAt}.`, 14, y); 
-            
-            y = Math.max(y + 10, photoY + 45 + 5); // Clear Photo
+            doc.text(`I give below the particulars of myself, my family and my Assets & Liabilities as at ${asAt}.`, 14, y); y += 8;
 
             // Field Helper
             const printField = (lbl, val, x=14) => {
@@ -1105,7 +1119,7 @@
             doc.text("A. LIC Policies", 14, y);
             doc.autoTable({
                 startY: y+1,
-                head: [['Policy No', 'Issue Dt', 'Sum Assured', 'Branch', 'Prem', 'Paid Up', 'Surr Val']],
+                head: [['Policy No', 'Issue Dt', 'Sum Assured', 'Branch', 'Prem', 'Paid Up To', 'Surr Val']],
                 body: getTableData('licTable'),
                 theme: 'grid',
                 styles: { fontSize: 8 },
@@ -1206,7 +1220,7 @@
                 styles: { fontSize: 8 },
                 headStyles: { fillColor: [220,220,220], textColor:0 }
             });
-            y = doc.lastAutoTable.finalY + 6;
+            y = doc.lastAutoTable.finalY + 15; // Gap for summary
 
             if(y > 250) { doc.addPage(); y=20; }
             
