@@ -1025,9 +1025,9 @@
             doc.setFont("helvetica", "bold");
             
             const photoW = 35;
-            const photoH = 45;
+            const photoH = 40; // Slightly reduced height
             const photoX = pageWidth - 14 - photoW; 
-            const photoY = 15; // Placed at top right, near logo vertical start
+            const photoY = 10; // moved up as requested
             
             doc.text(doc.splitTextToSize(title, 130), 14, y);
             
@@ -1036,7 +1036,7 @@
                  doc.rect(photoX, photoY, photoW, photoH);
             } else {
                 doc.rect(photoX, photoY, photoW, photoH);
-                doc.setFontSize(8).text("Photo", photoX+12, photoY+25);
+                doc.setFontSize(8).text("Photo", photoX+12, photoY+20);
             }
             
             y += 15; 
@@ -1196,8 +1196,8 @@
             });
             y = doc.lastAutoTable.finalY + 5;
 
-            const totAssets = document.getElementById('dispTotalAssets').innerText;
-            doc.setFont("helvetica", "bold").text(`9.6 Total of all assets: ${totAssets}`, 14, y); y+=8;
+            const totAssets = document.getElementById('dispTotalAssets').innerText.replace('₹', '').trim();
+            doc.setFont("helvetica", "bold").text(`9.6 Total of all assets: Rs. ${totAssets}`, 14, y); y+=8;
 
             doc.text("10. Details of Loans:", 14, y);
             doc.autoTable({
@@ -1228,15 +1228,15 @@
             doc.setDrawColor(0); doc.setLineWidth(0.5); doc.rect(14, y, 180, 25);
             doc.setFontSize(10).text("NET WORTH SUMMARY", 16, y+6); doc.line(14, y+8, 194, y+8);
             
-            const liab = document.getElementById('dispTotalLiab').innerText;
-            const net = document.getElementById('dispNetWorth').innerText;
+            const liab = document.getElementById('dispTotalLiab').innerText.replace('₹', '').trim();
+            const net = document.getElementById('dispNetWorth').innerText.replace('₹', '').trim();
             
             let sumY = y+14;
             doc.setFont("helvetica", "normal");
-            doc.text("Total Assets:", 20, sumY); doc.text(totAssets, 180, sumY, {align:'right'}); sumY+=5;
-            doc.text("Total Liabilities:", 20, sumY); doc.text(liab, 180, sumY, {align:'right'}); sumY+=6;
+            doc.text("Total Assets:", 20, sumY); doc.text(`Rs. ${totAssets}`, 180, sumY, {align:'right'}); sumY+=5;
+            doc.text("Total Liabilities:", 20, sumY); doc.text(`Rs. ${liab}`, 180, sumY, {align:'right'}); sumY+=6;
             doc.setFont("helvetica", "bold");
-            doc.text("Net Worth:", 20, sumY); doc.text(net, 180, sumY, {align:'right'});
+            doc.text("Net Worth:", 20, sumY); doc.text(`Rs. ${net}`, 180, sumY, {align:'right'});
             y += 35;
 
             if(y > 230) { doc.addPage(); y=20; }
